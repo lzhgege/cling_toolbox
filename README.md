@@ -1,39 +1,77 @@
 # cling_toolbox
 
 #### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+{**Cling_toolbox工具终极目标，目前资产优化方面只能说再原始的ass基础上做了显示优化对于场景摆放有了很大的改善，不再像ass显示那样卡顿，对于动画/渲染环节来说也能看到场景的实体模型且有多种显示模式切换不会卡顿，前提是显卡rtx20+。USD流程更新中，这样基本适用所有环节}
 
 #### 软件架构
-软件架构说明
+{
+    "功能介绍": {
+        "实用工具": ["搜索", 
+                    "分类",
+                    "个人收藏",
+                    "自由添加工具",
+                    "个性修改"],
+        "材质库": [
+            "搜索",
+            "分类",
+            
+            {
+                "创建材质球工具": [
+                    "自由命名",
+                    "自动色彩空间",
+                    "可选UDIM",
+                    "可选映射节点",
+                    "可选调色节点",
+                    "normal/bump节点自由选择"
+                ]
+            },
+            {
+                "导入材质库": ["自由命名", "分类选择"]
+            }
+        ],
+        "资产库": [
+            "双击创建GPU+ASS套件",
+            "选择位移物体创建则自动匹配",
+            "导入/引用ma文件",
+            "自持项目/分类/名称筛选",
+            {
+                "导出到资产库": [
+                    "导出自动命名",
+                    "后台设置导出路径（防止乱放）",
+                    "自定义版本导出（Low版本自动降低贴图分辨率）",
+                    "贴图复制到新目录并指定路径",
+                    "导出时支持gpu颜色选择（用于创建后颜色区分）"
+                    
+                ]
+            },
+            {
+                "切换显示": ["版本切换", 
+                            "GPU显示切换",
+                            "ass/gpu/ma三者互相转换支持单一存在或者多个存在"]
+            }
+        ]
+    }
+}
 
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+在线版傻瓜式安装：双击运行“cling_toolbox一键安装.bat”然后重启maya即可享用。
+有网情况下直接建议使用一键安装方便快捷
+
+ 
+
+离线版安装：点击右侧立即下载按钮下载压缩包安装，将其解压到D:\Cling_toolbox，
+
+双击压缩包内的“离线版安装.bat”装完成后重启maya生效
+
+安装完成后重启maya
+
+
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+更多详细使用说明：https://www.kdocs.cn/l/ccYmd7tdoOnR
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
