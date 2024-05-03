@@ -1,0 +1,41 @@
+
+{
+    "buttons": [
+        {
+            "icon": "cube.png",
+            "text": "创建立方",
+            "command": "cmds.polyCube()"
+        },
+        {
+            "icon": "sphere.png",
+            "text": "创建球体",
+            "command": "cmds.polySphere()"
+        },
+        {
+            "icon": "cone.png",
+            "text": "创建圆锥",
+            "command": "cmds.polyCone()"
+        },
+        {
+            "icon": "pyramid.png",
+            "text": "创建金字",
+            "command": "cmds.polyPyramid()"
+        },
+        {
+            "icon": "menuIconModify.png",
+            "text": "居中坐标",
+            "command": "cmds.CenterPivot()"
+        },
+        {
+            "icon": "menuIconModify.png",
+            "text": "原点坐标",
+            "command": "cmds.ResetTransformations()"
+        },
+        {
+            "icon": "menuIconModify.png",
+            "text": "冻结坐标",
+            "command": "cmds.FreezeTransformations()"
+        }
+
+    ]
+}

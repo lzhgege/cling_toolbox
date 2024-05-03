@@ -1,0 +1,78 @@
+{
+global string $gShelfTopLevel;
+string $currentShelf = `tabLayout -query -selectTab $gShelfTopLevel`;
+setParent $currentShelf;
+string $asInstallScriptLocation=`asInstallScriptLocation`;
+if (`gmatch $asInstallScriptLocation "*\*"`)
+	$asInstallScriptLocation=`substituteAllString $asInstallScriptLocation "\\" "/"`;
+string $scriptName="MistTool";
+string $path = $asInstallScriptLocation;
+string $icon_path = $asInstallScriptLocation+"icons/icon.png";
+string $script_file = $asInstallScriptLocation + "迷雾-质检工具.py";
+
+string $command = "";
+$command += ("globals()[\'__file__\'] = u\'" + $script_file + "\'\n");
+$command += "execfile(\'" + $script_file + "\',globals())";
+
+
+
+string $shelfName = "MistTool";
+    
+/* Check If Shelf Exists  */
+string $shelfTabList[] = `shelfTabLayout -q -childArray $gShelfTopLevel`;
+string $MistToolTab = $shelfName;
+if(!stringArrayContains($shelfName, $shelfTabList))
+{
+	$MistToolTab = addNewShelfTab($shelfName);
+}
+
+
+/* Create Shelf Button  */
+setParent $MistToolTab;
+
+string $shelfButton = "QualityCheckToolButton";
+/*
+string $shelfButtonList[] = `shelfLayout -q -childArray $MistToolTab`;
+for($each in $shelfButtonList)
+{
+	string $name = `shelfButton -q -l $each`;
+	if($name == $shelfButton)
+	{
+		// remove old button
+		deleteUI $each;
+	}	
+}*/
+if(`shelfButton -exists $shelfButton`)
+    deleteUI $shelfButton;
+
+shelfButton 
+	-command $command
+	-label "QualityCheckToolButton"
+	-imageOverlayLabel "迷雾-质检"
+	-image $icon_path
+	-sourceType "python"
+	-p $MistToolTab
+	"QualityCheckToolButton";
+saveShelf $MistToolTab (`internalVar -ush` + "shelf_MistTool");
+
+// python($command);
+
+//--installTemplate resume--//
+print ("\n// "+$scriptName+" has been added to current shelf.\n");
+}
+global proc asInstallScriptLocator (){}
+
+global proc string asInstallScriptLocation ()
+{
+string $whatIs=`whatIs asInstallScriptLocator`;
+string $fullPath=`substring $whatIs 25 999`;
+string $buffer[];
+string $slash="/";
+if (`gmatch $whatIs "*\\\\*"`)//sourced from ScriptEditor
+	$slash="\\";
+int $numTok=`tokenize $fullPath $slash $buffer`;
+int $numLetters=size($fullPath);
+int $numLettersLastFolder=size($buffer[$numTok-1]);
+string $scriptLocation=`substring $fullPath 1 ($numLetters-$numLettersLastFolder)`;
+return $scriptLocation;
+}

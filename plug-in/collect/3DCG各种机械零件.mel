@@ -1,0 +1,2103 @@
+//Special thanks to Raja Kumar Surjen
+//Free for Educational and Personal Purpose Not for  Commercial.
+// All Assets Are unwrapped
+
+   if ( `window -exists "nameWindowss"` ) {
+    deleteUI "nameWindowss"; windowPref -remove "nameWindowss";
+    }
+    
+    
+window -title "3DG NUT"  -s  0  -widthHeight 206 388 "nameWindowss"; 
+
+
+//It Will create a Donate Button - - - - - - - - - - - - /////////////
+
+    columnLayout -adjustableColumn true;
+    button  -label  "      DONATE      "  -bgc 0.05 0.05 0.05 -command "Artist_Jay()";
+   
+    setParent ..;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+string $form = `formLayout`;
+string $tabs = `tabLayout   -innerMarginWidth 60 -innerMarginHeight 60  -borderStyle "none" `;
+
+formLayout -edit
+     -attachForm $tabs "top"    0
+     -attachForm $tabs "left"   0
+     -attachForm $tabs "bottom" 0
+     -attachForm $tabs "right"  0
+     $form;
+     
+     
+// *************************************** NUT LAYOUT STARTS FROM HERE  ***************************************  //
+
+ string $child0 = `rowColumnLayout -numberOfColumns 4 -rowSpacing 2 2  -cs 2 3 -cs 3 3  -cs 4 3 `;
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_01.png" -command "Nut_01_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_02.png" -command "Nut_02_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_03.png" -command "Nut_03_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_04.png" -command "Nut_04_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_05.png" -command "Nut_05_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_06.png" -command "Nut_06_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_07.png" -command "Nut_07_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_08.png" -command "Nut_08_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_09.png" -command "Nut_09_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_10.png" -command "Nut_10_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_11.png" -command "Nut_11_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_12.png" -command "Nut_12_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_13.png" -command "Nut_13_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_14.png" -command "Nut_14_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_15.png" -command "Nut_15_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_16.png" -command "Nut_16_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_17.png" -command "Nut_17_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_18.png" -command "Nut_18_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_19.png" -command "Nut_19_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_20.png" -command "Nut_20_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_21.png" -command "Nut_21_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_22.png" -command "Nut_22_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_23.png" -command "Nut_23_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_24.png" -command "Nut_24_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_25.png" -command "Nut_25_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_26.png" -command "Nut_26_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_27.png" -command "Nut_27_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Nut_28.png" -command "Nut_28_Proc()";    
+ 
+                setParent ..;
+                
+ // ***************************************  NUT LAYOUT STARTS FROM HERE  ***************************************  //               
+     
+ string $child1 = `rowColumnLayout -numberOfColumns 4 -rowSpacing 2 2  -cs 2 3 -cs 3 3  -cs 4 3 `;
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_01.png" -command "Bolt_01_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_02.png" -command "Bolt_02_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_03.png" -command "Bolt_03_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_04.png" -command "Bolt_04_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_05.png" -command "Bolt_05_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_06.png" -command "Bolt_06_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_07.png" -command "Bolt_07_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_08.png" -command "Bolt_08_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_09.png" -command "Bolt_09_Proc()";
+         symbolButton -w 48 -h 48 -image "3DG_Nut/Images/Bolt_10.png" -command "Bolt_10_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_11.png" -command "Bolt_11_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_12.png" -command "Bolt_12_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_13.png" -command "Bolt_13_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_14.png" -command "Bolt_14_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_15.png" -command "Bolt_15_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_16.png" -command "Bolt_16_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_17.png" -command "Bolt_17_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_18.png" -command "Bolt_18_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_19.png" -command "Bolt_19_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_20.png" -command "Bolt_20_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_21.png" -command "Bolt_21_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_22.png" -command "Bolt_22_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_23.png" -command "Bolt_23_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_24.png" -command "Bolt_24_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_25.png" -command "Bolt_25_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_26.png" -command "Bolt_26_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_27.png" -command "Bolt_27_Proc()";
+         symbolButton -w 47 -h 47 -image "3DG_Nut/Images/Bolt_28.png" -command "Bolt_28_Proc()"; 
+         
+         setParent ..;
+        
+// ***************************************  PIPE LAYOUT STARTS FROM HERE  ***************************************  // 
+          string $child2 = `rowColumnLayout -numberOfColumns 4 -rowSpacing 2 2  -cs 2 3 -cs 3 3  -cs 4 3`;
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_01.png" -command "Pipe_01_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_02.png" -command "Pipe_02_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_03.png" -command "Pipe_03_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_04.png" -command "Pipe_04_Proc()";  
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_05.png" -command "Pipe_05_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_06.png" -command "Pipe_06_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_07.png" -command "Pipe_07_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_08.png" -command "Pipe_08_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_09.png" -command "Pipe_09_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_10.png" -command "Pipe_10_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_11.png" -command "Pipe_11_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_12.png" -command "Pipe_12_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_13.png" -command "Pipe_13_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_14.png" -command "Pipe_14_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_15.png" -command "Pipe_15_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_16.png" -command "Pipe_16_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_17.png" -command "Pipe_17_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_18.png" -command "Pipe_18_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_19.png" -command "Pipe_19_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_20.png" -command "Pipe_20_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_21.png" -command "Pipe_21_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_22.png" -command "Pipe_22_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_23.png" -command "Pipe_23_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_24.png" -command "Pipe_24_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_25.png" -command "Pipe_25_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_26.png" -command "Pipe_26_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_27.png" -command "Pipe_27_Proc()";
+         symbolButton -w 47 -h 47  -image "3DG_Nut/Images/Pipe_28.png" -command "Pipe_28_Proc()";
+         
+         
+         
+         
+         
+         setParent ..;
+         setParent ..;
+
+    tabLayout -edit -tabLabel $child0  "   NUT   "   -tabLabel $child1 "    BOLT   "   -tabLabel $child2 "    PIPE   " $tabs;
+    
+    setParent ..;
+    
+
+    
+
+
+
+ showWindow;
+
+// - - - - - -//
+
+                    //  Artist Credit ////////
+                    
+                    
+               	global proc Artist_Jay() {
+
+                      launch -web "https://gumroad.com/jayantbhatt007";
+                    
+                    }		
+                    
+                    
+// It will lower the Pivot 
+
+
+global proc pivot_Low()
+{
+    string $selObj[] = `ls -sl`;
+    
+    for($geo in $selObj)
+    {
+        
+        select -r $geo;
+    	float $getBoundArray[] = `xform -q -ws -bb`;
+    	float $bbXAv = (($getBoundArray[3] + $getBoundArray[0])/2);
+    	float $bbYAv = (($getBoundArray[4] + $getBoundArray[1])/2);
+    	float $bbZAv = (($getBoundArray[5] + $getBoundArray[2])/2);
+    	$getBoundArray[6] = $bbXAv;
+    	$getBoundArray[7] = $bbYAv;
+    	$getBoundArray[8] = $bbZAv;
+    	//move -a -rpr $getBoundArray[6] $getBoundArray[1] $getBoundArray[8] ($geo + ".rotatePivot") ($geo + ".scalePivot");
+    }
+}                    
+                    
+
+                    
+ // ---- NUT PROCEDURES START FROM HERE---- //
+
+ 
+            proc Nut_01_Proc()
+            {
+                     string $sel_faces[] = `ls -sl `;
+                    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_01.fbx";
+                    FBXImport -file $file_Path;
+                    string $rsRenamed = `rename "Nut_01" "Nut_01_Placed#"`;
+                    print $rsRenamed;
+                    select $sel_faces[0] $rsRenamed;
+                    float $rsScale = size($sel_faces);
+                    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                    delete $rspointOnPolyConstraint;
+                    FreezeTransformations;
+                    pivot_Low();
+
+
+
+
+            }
+
+
+//
+
+            proc Nut_02_Proc()
+            {
+                     string $sel_faces[] = `ls -sl `;
+                    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_02.fbx";
+                    FBXImport -file $file_Path;
+                    string $rsRenamed = `rename "Nut_02" "Nut_02_Placed#"`;
+                    print $rsRenamed;
+                    select $sel_faces[0] $rsRenamed;
+                    float $rsScale = size($sel_faces);
+                    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                    delete $rspointOnPolyConstraint;
+                    FreezeTransformations;
+                    pivot_Low();
+
+            }
+
+
+//
+
+
+            proc Nut_03_Proc()
+            {
+                     string $sel_faces[] = `ls -sl `;
+                    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_03.fbx";
+                    FBXImport -file $file_Path;
+                    string $rsRenamed = `rename "Nut_03" "Nut_03_Placed#"`;
+                    print $rsRenamed;
+                    select $sel_faces[0] $rsRenamed;
+                    float $rsScale = size($sel_faces);
+                    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                    delete $rspointOnPolyConstraint;
+                    FreezeTransformations;
+                    pivot_Low();
+
+
+            }
+
+
+
+ //
+
+        proc Nut_04_Proc()
+        {
+                 string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_04.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_04" "Nut_04_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+        proc Nut_05_Proc()
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_05.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_05" "Nut_05_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+ //
+
+        proc Nut_06_Proc()
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_06.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_06" "Nut_06_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+ //
+
+        proc Nut_07_Proc()
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_07.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_07" "Nut_07_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+
+ //
+
+        proc Nut_08_Proc()
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_08.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_08" "Nut_08_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+//
+
+
+        proc Nut_09_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_09.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_09" "Nut_09_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_10_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_10.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_10" "Nut_10_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+ //
+
+
+        proc Nut_11_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_11.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_11" "Nut_11_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+ //
+
+
+        proc Nut_12_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_12.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_12" "Nut_12_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+ //
+
+
+        proc Nut_13_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_13.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_13" "Nut_13_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_14_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_14.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_14" "Nut_14_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+
+
+ //
+
+        proc Nut_15_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_15.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_15" "Nut_15_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_16_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_16.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_16" "Nut_16_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_17_Proc()
+
+        {
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_17.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_17" "Nut_17_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+         //
+
+
+        proc Nut_18_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_18.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_18" "Nut_18_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+        //
+
+
+        proc Nut_19_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_19.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_19" "Nut_19_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_20_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_20.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_20" "Nut_20_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+
+//
+
+
+        proc Nut_21_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_21.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_21" "Nut_21_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+
+        proc Nut_22_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_22.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_22" "Nut_22_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_23_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_23.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_23" "Nut_23_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+
+
+        proc Nut_24_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_24.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_24" "Nut_24_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+ //
+
+
+        proc Nut_25_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_25.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_25" "Nut_25_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+  //
+
+
+        proc Nut_26_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_26.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_26" "Nut_26_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+  //
+
+
+        proc Nut_27_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_27.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_27" "Nut_27_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+ //
+         proc Nut_28_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Nut_28.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Nut_28" "Nut_28_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+// ---- //    BOLT CODE STARTS FROM HERE //
+
+ //
+         proc Bolt_01_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_01.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_01" "Bolt_01_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_02_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_02.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_02" "Bolt_02_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_03_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_03.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_03" "Bolt_03_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_04_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_04.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_04" "Bolt_04_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_05_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_05.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_05" "Bolt_05_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_06_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_06.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_06" "Bolt_06_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_07_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_07.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_07" "Bolt_07_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+//
+
+         proc Bolt_08_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_08.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_08" "Bolt_08_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_09_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_09.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_09" "Bolt_09_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_10_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_10.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_10" "Bolt_10_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_11_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_11.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_11" "Bolt_11_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_12_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_12.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_12" "Bolt_12_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+//
+
+         proc Bolt_13_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_13.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_13" "Bolt_13_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+
+//
+
+         proc Bolt_14_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_14.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_14" "Bolt_14_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_15_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_15.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_15" "Bolt_15_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+        }
+
+
+//
+
+         proc Bolt_16_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_16.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_16" "Bolt_16_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_17_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_17.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_17" "Bolt_17_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_18_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_18.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_18" "Bolt_18_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_19_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_19.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_19" "Bolt_19_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_20_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_20.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_20" "Bolt_20_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+
+//
+
+         proc Bolt_21_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_21.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_21" "Bolt_21_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_22_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_22.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_22" "Bolt_22_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_23_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_23.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_23" "Bolt_23_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_24_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_24.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_24" "Bolt_24_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_25_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_25.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_25" "Bolt_25_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_26_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_26.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_26" "Bolt_26_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_27_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_27.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_27" "Bolt_27_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+
+//
+
+         proc Bolt_28_Proc()
+
+        {
+
+
+                string $sel_faces[] = `ls -sl `;
+                string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Bolt_28.fbx";
+                FBXImport -file $file_Path;
+                string $rsRenamed = `rename "Bolt_28" "Bolt_28_Placed#"`;
+                print $rsRenamed;
+                select $sel_faces[0] $rsRenamed;
+                float $rsScale = size($sel_faces);
+                scale -r $rsScale $rsScale $rsScale $rsRenamed;
+                string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+                delete $rspointOnPolyConstraint;
+                FreezeTransformations;
+                pivot_Low();
+
+
+        }
+
+// ---- //PIPE CODE STARTS FROM HERE //
+
+        proc Pipe_01_Proc()
+
+        {
+
+             string $sel_faces[] = `ls -sl `;
+             string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_01.fbx";
+             FBXImport -file $file_Path;
+             string $rsRenamed = `rename "Pipe_01" "Pipe_01_Placed#"`;
+             print $rsRenamed;
+             select $sel_faces[0] $rsRenamed;
+             float $rsScale = size($sel_faces);
+             scale -r $rsScale $rsScale $rsScale $rsRenamed;
+             string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+             delete $rspointOnPolyConstraint;
+             FreezeTransformations;
+             pivot_Low();
+
+        }
+
+
+//
+
+proc Pipe_02_Proc()
+
+        {
+
+             string $sel_faces[] = `ls -sl `;
+             string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_02.fbx";
+             FBXImport -file $file_Path;
+             string $rsRenamed = `rename "Pipe_02" "Pipe_02_Placed#"`;
+             print $rsRenamed;
+             select $sel_faces[0] $rsRenamed;
+             float $rsScale = size($sel_faces);
+             scale -r $rsScale $rsScale $rsScale $rsRenamed;
+             string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+             delete $rspointOnPolyConstraint;
+             FreezeTransformations;
+             pivot_Low();
+
+        }
+
+
+//
+
+proc Pipe_03_Proc()
+
+        {
+
+            string $sel_faces[] = `ls -sl `;
+            string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_03.fbx";
+            FBXImport -file $file_Path;
+            string $rsRenamed = `rename "Pipe_03" "Pipe_03_Placed#"`;
+            print $rsRenamed;
+            select $sel_faces[0] $rsRenamed;
+            float $rsScale = size($sel_faces);
+            scale -r $rsScale $rsScale $rsScale $rsRenamed;
+            string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+            delete $rspointOnPolyConstraint;
+            FreezeTransformations;
+            pivot_Low();
+
+        }
+
+//
+
+proc Pipe_04_Proc()
+
+       {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_04.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_04" "Pipe_04_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+       }
+
+//
+
+proc Pipe_05_Proc()
+
+      {
+
+           string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_05.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_05" "Pipe_05_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+     }
+
+//
+
+proc Pipe_06_Proc()
+
+     {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_06.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_06" "Pipe_06_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+     }
+
+
+//
+
+proc Pipe_07_Proc()
+
+
+    {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_07.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_07" "Pipe_07_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+    }
+
+//
+
+proc Pipe_08_Proc()
+
+{
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_08.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_08" "Pipe_08_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+}
+
+//
+
+proc Pipe_09_Proc()
+
+        {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_09.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_09" "Pipe_09_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+        }
+
+
+//
+
+proc Pipe_10_Proc()
+
+      {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_10.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_10" "Pipe_10_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+      }
+
+
+//
+
+
+proc Pipe_11_Proc()
+
+    {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_11.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_11" "Pipe_11_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+    }
+
+//
+
+        proc Pipe_12_Proc()
+
+    {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_12.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_12" "Pipe_12_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+     }
+
+//
+
+
+        proc Pipe_13_Proc()
+
+     {
+
+         string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_13.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_13" "Pipe_13_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+      }
+
+//
+
+        proc Pipe_14_Proc()
+        {
+            string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_14.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_14" "Pipe_14_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+        }
+
+//
+
+proc Pipe_15_Proc()
+
+
+    {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_15.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_15" "Pipe_15_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();
+
+    }
+
+//
+
+proc Pipe_16_Proc()
+   {
+
+        string $sel_faces[] = `ls -sl `;
+        string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_16.fbx";
+        FBXImport -file $file_Path;
+        string $rsRenamed = `rename "Pipe_16" "Pipe_16_Placed#"`;
+        print $rsRenamed;
+        select $sel_faces[0] $rsRenamed;
+        float $rsScale = size($sel_faces);
+        scale -r $rsScale $rsScale $rsScale $rsRenamed;
+        string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+        delete $rspointOnPolyConstraint;
+        FreezeTransformations;
+        pivot_Low();;
+
+  }
+
+//
+
+proc Pipe_17_Proc()
+
+    {
+
+       string $sel_faces[] = `ls -sl `;
+       string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_17.fbx";
+       FBXImport -file $file_Path;
+       string $rsRenamed = `rename "Pipe_17" "Pipe_17_Placed#"`;
+       print $rsRenamed;
+       select $sel_faces[0] $rsRenamed;
+       float $rsScale = size($sel_faces);
+       scale -r $rsScale $rsScale $rsScale $rsRenamed;
+       string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+       delete $rspointOnPolyConstraint;
+       FreezeTransformations;
+       pivot_Low();
+
+    }
+
+//
+
+proc Pipe_18_Proc()
+
+   {
+
+      string $sel_faces[] = `ls -sl `;
+      string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_18.fbx";
+      FBXImport -file $file_Path;
+      string $rsRenamed = `rename "Pipe_18" "Pipe_18_Placed#"`;
+      print $rsRenamed;
+      select $sel_faces[0] $rsRenamed;
+      float $rsScale = size($sel_faces);
+      scale -r $rsScale $rsScale $rsScale $rsRenamed;
+      string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+      delete $rspointOnPolyConstraint;
+      FreezeTransformations;
+      pivot_Low();
+
+  }
+
+
+//
+
+proc Pipe_19_Proc()
+
+  {
+
+      string $sel_faces[] = `ls -sl `;
+      string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_19.fbx";
+      FBXImport -file $file_Path;
+      string $rsRenamed = `rename "Pipe_19" "Pipe_19_Placed#"`;
+      print $rsRenamed;
+      select $sel_faces[0] $rsRenamed;
+      float $rsScale = size($sel_faces);
+      scale -r $rsScale $rsScale $rsScale $rsRenamed;
+      string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+      delete $rspointOnPolyConstraint;
+      FreezeTransformations;
+      pivot_Low();
+
+  }
+
+
+//
+
+proc Pipe_20_Proc()
+
+  {
+
+      string $sel_faces[] = `ls -sl `;
+      string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_20.fbx";
+      FBXImport -file $file_Path;
+      string $rsRenamed = `rename "Pipe_20" "Pipe_20_Placed#"`;
+      print $rsRenamed;
+      select $sel_faces[0] $rsRenamed;
+      float $rsScale = size($sel_faces);
+      scale -r $rsScale $rsScale $rsScale $rsRenamed;
+      string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+      delete $rspointOnPolyConstraint;
+      FreezeTransformations;
+      pivot_Low();
+
+  }
+
+//
+
+proc Pipe_21_Proc()
+
+ {
+
+      string $sel_faces[] = `ls -sl `;
+      string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_21.fbx";
+      FBXImport -file $file_Path;
+      string $rsRenamed = `rename "Pipe_21" "Pipe_21_Placed#"`;
+      print $rsRenamed;
+      select $sel_faces[0] $rsRenamed;
+      float $rsScale = size($sel_faces);
+      scale -r $rsScale $rsScale $rsScale $rsRenamed;
+      string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+      delete $rspointOnPolyConstraint;
+      FreezeTransformations;
+      pivot_Low();
+
+ }
+
+
+//
+
+
+proc Pipe_22_Proc()
+
+ {
+
+     string $sel_faces[] = `ls -sl `;
+     string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_22.fbx";
+     FBXImport -file $file_Path;
+     string $rsRenamed = `rename "Pipe_22" "Pipe_22_Placed#"`;
+     print $rsRenamed;
+     select $sel_faces[0] $rsRenamed;
+     float $rsScale = size($sel_faces);
+     scale -r $rsScale $rsScale $rsScale $rsRenamed;
+     string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+     delete $rspointOnPolyConstraint;
+     FreezeTransformations;
+     pivot_Low();
+
+ }
+
+//
+
+proc Pipe_23_Proc()
+
+ {
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_23.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_23" "Pipe_23_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+
+ }
+
+//
+
+proc Pipe_24_Proc()
+
+{
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_24.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_24" "Pipe_24_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+
+}
+
+//
+
+proc Pipe_25_Proc()
+
+ {
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_25.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_25" "Pipe_25_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+
+ }
+
+//
+
+proc Pipe_26_Proc()
+
+ {
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_26.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_26" "Pipe_26_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+
+ }
+
+//
+
+proc Pipe_27_Proc()
+
+ {
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_27.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_27" "Pipe_27_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+
+ }
+
+
+//
+
+proc Pipe_28_Proc()
+
+{
+
+    string $sel_faces[] = `ls -sl `;
+    string $file_Path =  "D:/Cling_toolbox/icons/3DG_Nut/Mesh/Pipe_28.fbx";
+    FBXImport -file $file_Path;
+    string $rsRenamed = `rename "Pipe_28" "Pipe_28_Placed#"`;
+    print $rsRenamed;
+    select $sel_faces[0] $rsRenamed;
+    float $rsScale = size($sel_faces);
+    scale -r $rsScale $rsScale $rsScale $rsRenamed;
+    string $rspointOnPolyConstraint[] = `pointOnPolyConstraint -offset 0 0 0 -weight 1 `;
+    delete $rspointOnPolyConstraint;
+    FreezeTransformations;
+    pivot_Low();
+   
+}

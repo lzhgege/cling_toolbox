@@ -1,0 +1,264 @@
+
+
+global proc ani_info()
+
+{
+	
+	if (`window -ex ani_infoDetailsUI `)
+	deleteUI ani_infoDetailsUI ;
+	
+	window -t "信息显示" 
+		ani_infoDetailsUI ;
+	
+	formLayout mainForm;
+	
+	frameLayout -l "输入需要显示的信息" 
+			-la center
+			-lv 1
+			-mw 2
+			-mh 2
+			-bs etchedIn
+			mainFrame;
+	
+	
+	formLayout inForm;
+	
+	button -l "创建显示" -c "mg_CreateHUD()" applyButton;
+	button -l "删除显示" -c "mg_removeHUD()" cancelButton;
+	
+	frameLayout -l "" -lv 0
+			-mw 2
+			-mh 2
+			disFrame;
+	
+	columnLayout -adj 1 -cat both 5 disCol;
+	
+	text -l "    用户名:" -align left ownertxt;
+	textField -text `getenv "USERNAME"` -enable 0 owner;
+	
+	separator -h 4 -style "none";
+	checkBoxGrp -l "  文件名称 :      " -l1 "yes/no" -value1 1 -columnWidth2 70 80 sceneInfoSwitch;
+	textField -text `file -q -namespace` -enable off sceneInfo ; 
+
+	separator -h 4 -style "none";
+	checkBoxGrp -l "日期时间     " -l1 "yes/no" -value1 1 -columnWidth2 60 80 dateSwitch;
+	textField -text `date -format "DD - MM - YYYY | hh:mm "` -enable off date ;
+	
+	checkBoxGrp -l "显示帧    " -l1 "yes/no" -value1 1 -columnWidth2 50 80 frameSwitch;
+
+	setParent inForm;
+	
+	frameLayout -l "" -lv 0
+			-mw 2
+			-mh 2
+			ableFrame;
+	
+	columnLayout -adj 1 -cat "both" 5 ableFrame;
+	
+	checkBoxGrp -l "动画作者:    " -l1 "yes/no" -value1 1 -columnWidth2 60 80 artistSwitch;
+	textField -text `getenv "USERNAME"` artist;
+	
+	separator -h 4 -style "none";
+	checkBoxGrp -l "Scene Number:" -l1 "yes/no" -value1 0 -columnWidth2 85 80 sceneNumSwitch;
+	textField sceneNum ;
+	
+	separator -h 4 -style "none";
+	checkBoxGrp -l "当前状态:" -l1 "yes/no" -value1 0 -columnWidth2 60 80 statusSwitch;
+	textField status ;
+	popupMenu;
+	menuItem -l "Work In Progress" -c ("textField -e -text \"Work In Progress\" status");
+	menuItem -l "To Be Approved" -c ("textField -e -text \"To Be Approved\" status");
+	menuItem -l "Approved" -c ("textField -e -text \"Approved\" status");
+
+	separator -h 4 -style "none";
+	//checkBoxGrp -l "Frame HUD :   " -l1 "yes/no" -value1 1 -columnWidth2 85 80 frameSwitch;
+
+	//setParent mainForm;
+	
+	
+	
+	formLayout -e
+	
+		-af disFrame left 5
+		-af disFrame top 5
+		-ap disFrame right 0 48
+
+		-af ableFrame right 5
+		-af ableFrame top 5
+		-ap ableFrame left 0 52
+	
+		-ac applyButton top 5 disFrame
+		-af applyButton left 0
+		-ap applyButton right 0 52
+	
+		-ac cancelButton top 5 disFrame
+		-af cancelButton right 0
+		-ap cancelButton left 0 52
+	
+	inForm;
+	
+	formLayout -e
+	
+		-af mainFrame top 5
+		-af mainFrame left 5
+		-af mainFrame right 5
+		-af mainFrame bottom 5
+	
+	
+	 mainForm;
+	
+	
+	
+	
+	showWindow ani_infoDetailsUI ;
+
+}
+
+
+global proc mg_CreateHUD()
+{
+
+
+string $owner = `textField -q -text owner `;
+string $artist = `textField -q -text artist `;
+
+string $sceneInfo = `textField -q -text sceneInfo`;
+string $sceneNum = ` textField -q -text sceneNum `;
+
+string $date = `textField -q -text date` ;
+string $status= `textField -q -text status ` ;
+
+
+if	(	
+	(($artist=="") && (` checkBoxGrp -q -value1 artistSwitch `==1))	|| 
+	(($sceneNum =="") && (` checkBoxGrp -q -value1 sceneNumSwitch`==1)) 	||
+	(($status=="") && (` checkBoxGrp -q -value1 statusSwitch`==1))
+	)
+	{
+	error "Head Up Info : - load the inputs correctly !";
+	}
+	
+
+mg_removeHUD();
+
+	if (` checkBoxGrp -q -value1 artistSwitch `==1)
+	{
+		headsUpDisplay	-l "Animator     "
+					-allowOverlap 1
+					-b 2
+					-s 5
+					-dataFontSize large
+					-command ("mg_string" + " " + $artist)
+					artistName;
+	}
+	
+
+ 	if (` checkBoxGrp -q -value1 sceneInfoSwitch `==1)
+       {                   
+		headsUpDisplay	-l "Scene Info   "
+					-allowOverlap 1
+					-b 4
+					-s 5
+					-dataFontSize large
+					-command "file -q -namespace" //"mg_scene()"
+					sceneName;
+	}
+
+
+ 	if (` checkBoxGrp -q -value1 sceneNumSwitch`==1)
+	{
+		headsUpDisplay	-l "Scene # :"
+					-allowOverlap 1
+					-b 2
+					-s 2
+					-dataFontSize large
+					-command ("mg_string" + " " + $sceneNum  )
+					sceneNum;
+	}
+
+ 	if (` checkBoxGrp -q -value1 dateSwitch`==1)
+	{
+		headsUpDisplay	-l "Date | Time  "
+					-allowOverlap 1
+					-event "idle"
+					-nodeChanges "attributeChange"
+					-dataFontSize large
+					-command "date -format \"MM / DD / YYYY   |   hh:mm \""
+					-b 3
+					-s 5
+					dateName;
+	}
+
+
+ 	if (` checkBoxGrp -q -value1 statusSwitch`==1)
+	{
+		headsUpDisplay	-l "Status        "
+					-allowOverlap 1
+					-b 2
+					-s 7
+					-dataFontSize large
+					-command ("mg_string" + " \"" + $status + "\"")
+					status;
+	}
+
+ 	if (` checkBoxGrp -q -value1 frameSwitch `==1)
+	{
+		headsUpDisplay	-l "Frame         "
+					-allowOverlap 1
+					-b 2
+					-s 8
+					-nodeChanges "instanceChange"
+					-dataFontSize large
+					-preset "currentFrame"
+					frameCounter;
+	}
+
+
+}
+
+
+
+
+global proc string mg_string(string $string)
+{
+return $string;
+}
+
+global proc float mg_float(float $float)
+{
+return $float;
+}
+
+
+global proc mg_removeHUD()
+
+{
+	if (`headsUpDisplay -exists versionName` )
+	headsUpDisplay -rem versionName;
+	
+	if (`headsUpDisplay -exists artistName` )
+	headsUpDisplay -rem artistName;
+	
+	if (`headsUpDisplay -exists  ownerName` )
+	headsUpDisplay -rem ownerName;
+	
+	if (`headsUpDisplay -exists sceneName`)
+	headsUpDisplay -rem sceneName;
+	
+	if (`headsUpDisplay -exists dateName`)
+	headsUpDisplay -rem dateName;
+	
+	if (`headsUpDisplay -exists status`)
+	headsUpDisplay -rem status;
+
+	if (`headsUpDisplay -exists sceneNum`)
+	headsUpDisplay -rem sceneNum;
+
+	if (`headsUpDisplay -exists frameCounter`)
+	headsUpDisplay -rem frameCounter;
+
+
+}
+
+
+ani_info;

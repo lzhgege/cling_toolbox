@@ -1,0 +1,273 @@
+
+[
+    {
+        "name": "一键色彩空间",
+        "path": "D:/Cling_toolbox/plug-in/color_spacev.py",
+        "icon": ":out_colorProfile.png",
+        "group": "材质贴图",
+        "introduce": "一键修改所有的贴图色彩空间，可选sRBG和ACES两种模式"
+    },
+    {
+        "name": "FileTextureManager",
+        "path": "D:/Cling_toolbox/plug-in/FileTextureManager.mel",
+        "icon": ":imageDisplay.png",
+        "group": "材质贴图",
+         "introduce": "非常牛逼的贴图复制移动脚本，可以将当前文件的贴图复制到新的路径，该版本为优化版支持UDIM"
+    },
+    {
+        "name": "代理切换",
+        "path": "D:/Cling_toolbox/plug-in/arnold代理切换.py",
+        "icon": "D:/Cling_toolbox/icons/lh.png",
+        "group": "渲染工具",
+         "introduce": "该功能已合并到资产库中的多功能切换中"
+    },
+    {
+        "name": "代理刷新",
+        "path": "D:/Cling_toolbox/plug-in/arnold代理刷新.py",
+        "icon": "D:/Cling_toolbox/icons/asssx.png",
+        "group": "渲染工具",
+         "introduce": "重新读取一遍所有的ass"
+    },
+    {
+        "name": "ass添加序列循环表达式",
+        "path": "D:/Cling_toolbox/plug-in/ass添加序列循环表达式.py",
+        "group": "渲染工具",
+         "introduce": "循环动态ass时能用到"
+    },
+	{
+        "name": "ASS路径修改",
+        "path": "D:/Cling_toolbox/plug-in/ASS路径修改.py",
+        "group": "渲染工具",
+        "introduce": "将当前选择的所有ass指定一个新的路径"
+    },
+
+    {
+        "name": "spPaint3d",
+        "path": "D:/Cling_toolbox/plug-in/spPaint3d.py",
+        "group": "模型工具",
+        "introduce": "maya2020以下的版本来说可谓神器，可以用于刷植物等..."
+    },
+    {
+        "name": "批量属性修改",
+        "path": "D:/Cling_toolbox/plug-in/批量属性修改调用.py",
+        "group": "模型工具",
+        "introduce": "所有属性面板的都能修改，支持批量"
+    },
+	{
+        "name": "自动软硬边",
+        "path": "D:/Cling_toolbox/plug-in/collect/自动软硬边.mel",
+        "group": "模型工具",
+        "introduce": "顾名思义 自动软硬边"
+    },
+	{
+        "name": "物体一键替换",
+        "path": "D:/Cling_toolbox/plug-in/collect/Maya物体一键替换小工具.py",
+        "group": "模型工具"
+
+    },
+	{
+        "name": "坐标对齐到底部中心",
+        "path": "D:/Cling_toolbox/plug-in/collect/模型坐标到底部中心.mel",
+        "group": "模型工具",
+        "introduce": "将坐标对齐到选择物体的底部"
+    },
+	{
+        "name": "模型移动到世界坐标中心",
+        "path": "D:/Cling_toolbox/plug-in/collect/模型移动到世界坐标中心.mel",
+        "group": "模型工具",
+        "introduce": "将模型移动到世界坐标中心，注意坐标，可以配合剧中坐标，然后使用坐标对齐到底部中心工具，再使用模型移动到世界坐标中心"
+    },
+	{
+        "name": "清理UVSet",
+        "path": "D:/Cling_toolbox/plug-in/collect/清理UVSet.py",
+        "group": "模型工具",
+        "introduce": "清理多余的UV集"
+    },
+	{
+        "name": "渲染设置界面不显示修复",
+        "path": "D:/Cling_toolbox/plug-in/collect/渲染设置界面不显示修复.mel",
+        "group": "渲染工具",
+        "introduce": "类似找回窗口功能"
+    },
+	{
+        "name": "解决无法选择look_mel爆红",
+        "path": "D:/Cling_toolbox/plug-in/collect/解决无法选择look_mel爆红.mel",
+        "group": "模型工具"
+    },
+	{
+        "name": "选硬边工具",
+        "path": "D:/Cling_toolbox/plug-in/collect/选硬边工具.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "批量随机替代工具",
+        "path": "D:/Cling_toolbox/plug-in/collect/tjh_BatchReplacer_1_0_2_Main/tjh_BatchReplacer_1_0_2_Main.mel",
+        "group": "模型工具"
+    },
+	{
+        "name": "雪生成工具",
+        "path": "D:/Cling_toolbox/plug-in/collect/Snow Factory.v1.01.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "线段平均插件",
+        "path": "D:/Cling_toolbox/plug-in/collect/kmjAdjustLength/kmjAdjustLength.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "物体堆积",
+        "path": "D:/Cling_toolbox/plug-in/collect/tjh_rubbish_dumper.mel",
+        "group": "模型工具"
+    },
+	{
+        "name": "按面给材质物体检测及修复",
+        "path": "D:/Cling_toolbox/plug-in/collect/按面给材质物体检测及修复/scripts/checkAssignFaceShaderObj.py",
+        "group": "材质贴图"
+    },
+	{
+        "name": "贴图自动刷新开关",
+        "path": "D:/Cling_toolbox/plug-in/贴图自动刷新开关.mel",
+        "group": "材质贴图"
+    },
+	{
+        "name": "模型封洞",
+        "path": "D:/Cling_toolbox/plug-in/一键选择洞.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "GPUCache导出工具",
+        "path": "D:/Cling_toolbox/plug-in/GPUCache导出工具.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "当前选择处创建BOX",
+        "path": "D:/Cling_toolbox/plug-in/当前选择处创建Box.py",
+        "group": "模型工具"
+    },
+	{
+        "name": "建筑灯笼解算文件",
+        "path": "D:/Cling_toolbox/plug-in/添加ass灯笼解算文件.py",
+        "group": "渲染工具"
+    },
+	{
+        "name": "替换物体小助手",
+        "path": "D:/Cling_toolbox/plug-in/替换物体小助手.py",
+        "group": "模型工具",
+        "introduce": "cling写的小工具，可以用于替换选择物体，前提是保留了位移信息"
+    },
+	{
+        "name": "破碎工具",
+        "path": "D:/Cling_toolbox/plug-in/collect/pl_chipOff.mel",
+        "group": "模型工具"
+    },
+	{
+        "name": "场景路径检查",
+        "path": "D:/Cling_toolbox/plug-in/场景路径检查.py",
+        "group": "材质贴图"
+    },
+    {
+        "name": "代理转模型",
+        "path": "D:/Cling_toolbox/plug-in/collect/fx_AssToGeo.py",
+        "group": "渲染工具"
+    },
+    {
+        "name": "破损插件 Damage Inc V 1.2",
+        "path": "D:/Cling_toolbox/plug-in/collect/Damage_Inc_V/DamageIncV_1_2_python2.py",
+        "group": "模型工具"
+    },
+    {
+        "name": "Cable_2.0",
+        "path": "D:/Cling_toolbox/plug-in/collect/Cable/Cable_2.0.py",
+        "group": "模型工具"
+    },
+    {
+        "name": "ass相同打组",
+        "path": "D:/Cling_toolbox/plug-in/ass相同打组.py",
+        "group": "渲染工具"
+    },
+    {
+        "name": "兰伯特改arnold材质球",
+        "path": "D:/Cling_toolbox/plug-in/兰伯特改arnold材质球.py",
+        "group": "材质贴图"
+    },
+    {
+        "name": "ZiSpread",
+        "path": "D:/Cling_toolbox/plug-in/collect/ZiSpread.py",
+        "group": "模型工具",
+        "introduce": "官网：https://www.vertexture.org/?page_id=773\n模型平滑工具，1、选择边，2、双击工具，3、左键往左右拖拽"
+    },
+    {
+        "name": "Rope_绳索工具",
+        "path": "D:\\Cling_toolbox\\plug-in\\collect\\MayaDynamicRope_Tool\\Rope.py",
+        "group": "模型工具",
+        "introduce": "创建绳索很不错的一个工具，支持解算。",
+        "icon": "D:\\Cling_toolbox\\plug-in\\collect\\MayaDynamicRope_Tool\\Rope.png"
+    },
+    {
+        "name": "按面给材质物体检测及修复",
+        "path": "D:\\Cling_toolbox\\plug-in\\collect\\按面给材质物体检测及修复\\按面给材质物体检测及修复.py",
+        "group": "模型工具",
+        "introduce": "按面给材质物体检测及修复"
+
+    },
+    {
+        "name": "BH动画残影神器",
+        "path": "D:\\Cling_toolbox\\plug-in\\collect\\BH动画残影神器.mel",
+        "group": "动画工具",
+        "introduce": "来自国外梦工厂动画师使用的动画拖影插件\nhttps://www.wmiao.com/forum.php?mod=viewthread&tid=971\n\nmaya动画拖影插件bhGhost\n本插件可以帮助动画师一键创建POSE残影\n有效解决POSE动态不连贯问题\n快速提供动画师摆POSE效率。减少修改量"
+
+    },
+    {
+        "name": "HUD信息设置工具",
+        "path": "D:\\Cling_toolbox\\plug-in\\collect\\HUD信息设置工具.mel",
+        "group": "动画工具"
+    },
+    {
+        "name": "3DCG各种机械零件",
+        "path": "D:\\Cling_toolbox\\plug-in\\collect\\3DCG各种机械零件.mel",
+        "group": "模型工具",
+        "introduce": "先选择模型或者模型的点/线/面，在点击图标"
+    },
+    {
+        "sort": "",
+        "path": "D:/Cling_toolbox/plug-in/collect/Mist_RenameTool/迷雾-命名工具.py",
+        "name": "迷雾-命名工具",
+        "introduce": "",
+        "icon": "",
+		"group": "项目工具",
+		"exec_code": "globals()['__file__'] = 'D:/Cling_toolbox/plug-in/collect/Mist_RenameTool/迷雾-命名工具.py';execfile('D:/Cling_toolbox/plug-in/collect/Mist_RenameTool/迷雾-命名工具.py', globals())"
+    },
+	{
+        "sort": "",
+        "path": "D:/Cling_toolbox/plug-in/collect/Mist_QualityCheckTool/迷雾-质检工具.py",
+        "name": "迷雾-质检工具",
+        "introduce": "",
+        "icon": "",
+		"group": "项目工具",
+		"exec_code": "globals()['__file__'] = u'D:/Cling_toolbox/plug-in/collect/Mist_QualityCheckTool/迷雾-质检工具.py';execfile('D:/Cling_toolbox/plug-in/collect/Mist_QualityCheckTool/迷雾-质检工具.py',globals())"
+    },
+	{
+        "name": "场景灯光",
+        "path": "cmds.file('D:/Cling_toolbox/icons/lig/sp_lig.ma', reference=True)",
+        "group": "项目工具",
+		"introduce": "Substance Painter默认灯光"
+		
+    },
+    {
+        "name": "ASS路径查找替换",
+        "path": "D:/Cling_toolbox/plug-in/collect/ASS路径查找替换.py",
+        "group": "材质贴图",
+		"introduce": "自动获取当前场景中的所有ass并根据输入查找替换文件路径，用途方便批量更改ass路径"
+
+    },
+    {
+        "name": "映射新磁盘",
+        "path": "D:/Cling_toolbox/plug-in/collect/映射新磁盘.py",
+        "group": "项目工具",
+		"introduce": "在所选择得本地磁盘中新建一个文件夹，并将该文件夹映射为一个新得磁盘。注意：新磁盘的磁盘容量是读取原磁盘的！！删除磁盘：删除新建的文件夹者删除磁盘，重启电脑生效"
+
+    }
+	
+	
+
+]

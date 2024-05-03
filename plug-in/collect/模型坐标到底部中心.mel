@@ -1,0 +1,45 @@
+
+string $sel[] = `ls -sl`;
+
+if (`size $sel` > 0)
+{
+    for ($group in $sel)
+    {
+        if (`objectType $group` == "transform")
+        {
+            float $lowestY = 2147483647.0;
+            string $descendents[] = `listRelatives -allDescendents $group`;
+
+            for ($item in $descendents)
+            {
+                if (`objectType $item` == "mesh")
+                {
+                    int $vtxIdx;
+                    int $vCount[];
+                    float $pos[];
+                    float $crtY = 0.0;
+
+                    $vCount = `polyEvaluate -vertex $item`; // Get vertex count
+
+                    for ($vtxIdx = 0; $vtxIdx < $vCount[0]; $vtxIdx++) // Loop through vertex
+                    {
+                        $pos = `xform -q -ws -t ($item + ".vtx[" + $vtxIdx + "]")`; // Get vertex position
+                        $crtY = $pos[1];
+                        if ($crtY < $lowestY)
+                        {
+                            $lowestY = $crtY; // Update the lowest Y
+                        }
+                    }
+                }
+            }
+
+            if ($lowestY != 2147483647.0)
+            {
+                // Get current group pivot
+                float $groupPivot[] = `xform -q -ws -rp $group`;
+                // Set group pivot to the new Y position while keeping X and Z the same
+                xform -ws -rp $groupPivot[0] $lowestY $groupPivot[2] $group;
+            }
+        }
+    }
+}

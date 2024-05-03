@@ -1,0 +1,4 @@
+1. 解压
+2. install.mel 拖入maya
+   工具按钮会创建在shelf-MistTool里面
+3. 开始使用   

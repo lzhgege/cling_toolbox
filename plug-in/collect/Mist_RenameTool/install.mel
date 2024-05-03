@@ -1,0 +1,40 @@
+string $currentShelf = `tabLayout -query -selectTab $gShelfTopLevel`;
+setParent $currentShelf;
+string $asInstallScriptLocation=`asInstallScriptLocation`;
+
+string $scriptName="迷雾-命名工具";
+string $scriptfile=$asInstallScriptLocation+"迷雾-命名工具.py";
+string $command="globals()['__file__'] = '"+$scriptfile+"';";
+$command+="execfile(\""+$scriptfile+"\", globals())";
+string $icon=$asInstallScriptLocation+"icons/111.png";
+if (!`file -q -ex $scriptfile`)
+	error ("文件未找到: \""+$scriptfile+"\"");
+	
+if(`shelfButton -q -ex "RenameToolButton"`)
+	deleteUI "RenameToolButton";	
+shelfButton
+	-command $command
+	-annotation $scriptName
+	-label $scriptName
+	-image $icon
+	-image1 $icon
+	-sourceType "python"
+	RenameToolButton
+;
+print ("\n// "+$scriptName+" has been added to current shelf.\n");
+
+global proc asInstallScriptLocator (){}
+
+global proc string asInstallScriptLocation ()
+{
+string $whatIs=`whatIs asInstallScriptLocator`;
+
+string $fullPath=`substring $whatIs 25 999`;
+string $buffer[];
+int $numTok=`tokenize $fullPath "/" $buffer`;
+int $numLetters=size($fullPath);
+int $numLettersLastFolder=size($buffer[$numTok-1]);
+string $scriptLocation=`substring $fullPath 1 ($numLetters-$numLettersLastFolder)`;
+return $scriptLocation;
+}
+

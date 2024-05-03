@@ -1,0 +1,82 @@
+[
+{"type":"all","label":"","groups":
+	[
+		[
+		{"label": "", "name": "Geometry", "parent": "","siblingBrothers": 0},
+		{"label": "", "name": "Building_ModGrp", "parent": "Geometry","siblingBrothers": 0},
+		{"label": "", "name": "Nature_ModGrp", "parent": "Geometry","siblingBrothers": 0},
+		{"label": "", "name": "Prop_Grp", "parent": "Geometry","siblingBrothers": 0},
+		{"label": "", "name": "DL_Grp", "parent": "Geometry","siblingBrothers": 0},
+		{"label": "", "name": "FxModel_Grp", "parent": "Geometry","siblingBrothers": 0},
+		{"label": "自定义组在代码中控制", "name": "GenaralCustom_ModGrp", "parent": "Geometry","siblingBrothers": 0}
+		]
+	]
+},	
+
+{"type":"building","label":"建筑系","groups":
+	[
+		[
+			{"label": "高模", "name": "Building_Hi_ModGrp", "parent": "Building_ModGrp","siblingBrothers": 10},
+			{"label": "低模", "name": "Building_Low_ModGrp", "parent": "Building_ModGrp","siblingBrothers": 10},
+			{"label": "表演区域模型", "name": "BYQY_ModGrp", "parent": "Building_ModGrp","siblingBrothers": 10}
+		]
+
+	]
+
+},
+
+{"type":"nature","label":"自然系","groups":
+	[
+		[
+			{"label": "树", "name": "Tree_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "花", "name": "Flower_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "草", "name": "Grass_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "山", "name": "Mountain_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10}
+		],
+		[
+			{"label": "石头", "name": "Stone_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "灌木", "name": "Bush_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "杂物", "name": "Nature_Varia_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10},
+			{"label": "地面", "name": "Ground_ModGrp", "parent": "Nature_ModGrp","siblingBrothers": 10}
+
+		]
+	]
+},
+
+{"type":"prop","label":"道具","groups":
+	[
+		[
+			{"label": "交通工具", "name": "Vehicle_ModGrp", "parent": "Prop_Grp","siblingBrothers": 10},
+			{"label": "生活物品", "name": "Living_Things_ModGrp", "parent": "Prop_Grp","siblingBrothers": 10},
+			{"label": "杂物", "name": "Prop_Varia_ModGrp", "parent": "Prop_Grp","siblingBrothers": 10}
+		]
+	]
+},
+
+{"type":"dl","label":"代理","groups":
+	[
+		[
+			{"label": "树", "name": "DL_Tree_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "花", "name": "DL_Flower_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "草", "name": "DL_Grass_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "山", "name": "DL_Mountain_ModGrp", "parent": "DL_Grp","siblingBrothers": 10}
+		],
+		[
+			{"label": "石头", "name": "DL_Stone_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "灌木", "name": "DL_Bush_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "杂物", "name": "DL_Varia_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "建筑", "name": "DL_Building_ModGrp", "parent": "DL_Grp","siblingBrothers": 10},
+			{"label": "自定义组在代码中控制", "name": "DL_DlCustom_ModGrp", "parent": "DL_Grp","siblingBrothers": 0}
+		]
+	]
+},
+
+{"type":"fxmodel","label":"特效模型","groups":
+	[
+		[
+			{"label": "特效模型", "name": "Fx_Model_ModGrp", "parent": "FxModel_Grp","siblingBrothers": 10}
+		]
+	]
+}
+
+]

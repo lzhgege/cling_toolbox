@@ -1,0 +1,92 @@
+{"script":[
+    {
+        "command": "C:/Maya_toolbox/plug-in/color_spacev.py",
+        "name": "\u4e00\u952e\u8272\u5f69\u7a7a\u95f4",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command":"C:/Maya_toolbox/plug-in/FileTextureManager.mel",
+        "name": "FileTextureManager",
+        "icon": "C:\\Maya_toolbox\\icons\\tex.png",
+        "type": "mel"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/spPaint3d/scripts/spPaint3d.mel",
+        "name": "spPaint3d",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "mel"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/HyperScene.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    },
+    {
+        "command": "C:/Maya_toolbox/plug-in/Mist_MaterialTool/dw_20211102.py",
+        "name": "HyperScene",
+        "icon": "C:\\Maya_toolbox\\icons\\color.png",
+        "type": "python"
+    }
+]}

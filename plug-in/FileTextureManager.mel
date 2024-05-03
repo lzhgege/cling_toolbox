@@ -1,0 +1,2171 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+///
+/// Procedure Name :	FileTextureManager.mel	V3.0
+///
+/// Updated :	Aug, 2005
+///
+/// Author :	Crow Yeh
+/// Contact :	crow@citiz.net
+///
+/// Description :
+///
+///		File Texture Manager works on Windows/IRIX/Linux/MAC, manages file textures in a handy way.
+///		FTM's basic functions:
+///		1. Analyse scene file textures and give texture existence report.
+///		2. Copy or move the original texture files to user defined path (customizable).
+///		3. Update file textures' path info.
+///		4. Handle path strings. eg. replace string, add prefix, append suffix...
+///
+///		FTM's extra fuctions:
+///		1. Substitute file texture's path root string. eg. redirecting sourceiamges...
+///		2. Setup/Cancel BOT for file textures according to their resolution.
+///		3. Filter type batch set.
+///		4. Texture file format conversion.
+///
+/// How to use :
+///
+///		Put the script in your scripts folder then start Maya. Type
+///		and execute	"FileTextureManager" in command line or Script
+///		Editor, an UI window will appear. Then follow the help in the UI
+///		window to finish your job. Have fun!
+///
+/// Inputs :	None
+///
+/// Return :	None
+///
+/// All Rights Reserved .
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////
+// MEL Starts //
+////////////////
+
+global string $picNodeTypeArray[];
+$picNodeTypeArray = {"file","alTriplanar","RedshiftCameraMap","RedshiftSprite","RedshiftLightGobo","RedshiftNormalMap"};
+
+global proc string[] getRefFileAttrArray(string $nodeType)
+{    
+    //file
+    global string $fileRefFileAttrArray[];
+    $fileRefFileAttrArray = {"fileTextureName"};
+    
+    //alTriplanar
+    global string $alTriplanarRefFileAttrArray[];
+    $alTriplanarRefFileAttrArray = {"texture"};
+    
+    //RedshiftCameraMap
+    global string $RedshiftCameraMapRefFileAttrArray[];
+    $RedshiftCameraMapRefFileAttrArray = {"tex0"};
+    
+    //RedshiftSprite
+    global string $RedshiftSpriteRefFileAttrArray[];
+    $RedshiftSpriteRefFileAttrArray = {"tex0"};
+    
+    //RedshiftLightGobo
+    global string $RedshiftLightGoboRefFileAttrArray[];
+    $RedshiftLightGoboRefFileAttrArray = {"tex0"};
+    
+    //RedshiftNormalMap
+    global string $RedshiftNormalMapRefFileAttrArray[];
+    $RedshiftNormalMapRefFileAttrArray = {"tex0"};
+    
+    string $var = "$" + $nodeType + "RefFileAttrArray";
+    string $envArray[] = `env`;
+    global string $refFileAttrArray[];
+    if(stringArrayContains($var,$envArray))
+    {            
+        eval("$refFileAttrArray = $" + $nodeType + "RefFileAttrArray");
+        
+    }else{
+        $refFileAttrArray = {};
+    }
+    return($refFileAttrArray);    
+}
+
+global proc string getFirstRefFileAttr(string $nodeType)
+{
+	string $refFileAttrArray[] = getRefFileAttrArray($nodeType);
+	if(size($refFileAttrArray))
+	{
+		return $refFileAttrArray[0];
+	}else{
+		return "";
+	}
+}
+
+global proc string[] getAllPicNodeArray(int $selection)
+{
+    global string $picNodeTypeArray[];
+    int $picNodeTypeCount = size($picNodeTypeArray);
+    string $files[] = {};
+    int $i;
+    for($i = 0;$i < $picNodeTypeCount;$i++)
+    {
+        if(hasType($picNodeTypeArray[$i])){
+            string $typeNodeArray[];
+            if($selection)
+            {
+            	$typeNodeArray = `ls -sl -typ $picNodeTypeArray[$i]`;
+            }else
+            {
+            	$typeNodeArray = `ls -typ $picNodeTypeArray[$i]`;
+            }
+            
+            $files = stringArrayCatenate($files, $typeNodeArray);
+        }
+    }
+    return $files;
+}
+
+//add 2017/5/26 by Eafun
+global proc int hasType(string $nodeType){
+    string $allNodeTypes[] = `allNodeTypes`;
+    for($type in $allNodeTypes){
+        if($nodeType == $type){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// array of formats supported by format conversion function
+global string $FTM_FCAllFormats[];
+$FTM_FCAllFormats = {"iff","sgi","tga","rgb","jpg","jpeg","tif","tiff","bmp","bw","icon","cin","pic","yuv","als","gif","lff","pxb","scn","ppm","pri","qtl","vst","rla"};
+
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Procedure to check selection
+//
+proc int FTM_SelCheck(string $nodes[]){
+int $sel = 0;
+if (size($nodes))
+	$sel = 1;
+else
+	confirmDialog -t "File Texture Manager" -m "At least one file texture node must be selected!" -b "OK";
+return $sel;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Procedure to remind user that job finished.
+//
+proc FTM_END(){
+		confirmDialog -t "File Texture Manager" -m "Job finished.\nRefer to Script Editor for details." -ma center -b "OK";
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Procedure to give logs
+//
+proc FTM_Log (string $type, string $node, string $log) {
+string $finLog;
+if (size($node))
+	$log = $node + "\n";
+else
+	$log = "\t" + $log + "\n";
+switch ($type) {
+	case "start":
+		$finLog = "\n***************************************************************************************************************\n\
+File Texture Manager Log starts...\n\
+***************************************************************************************************************\n";
+	break;
+	case "end":
+		$finLog = "***************************************************************************************************************\n\
+File Texture Manager Log ends...\n\
+***************************************************************************************************************\n";
+	break;
+	default:
+		$finLog = $log;
+	break;
+}
+print $finLog;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Get the right format of path(folder) to match current OS.
+//
+proc string FTM_GetPath (string $FTM_FileOrPath, string $FTM_OldPath)
+//$FTM_FileOrPath	Input type: file or path
+//$FTM_OldPath		The input
+{
+	$FTM_OldPath = `fromNativePath $FTM_OldPath`;
+	//Only want the path.
+	if ($FTM_FileOrPath == "file")
+		$FTM_OldPath = `dirname $FTM_OldPath`;
+	//Get rid of the slash at the end.
+	$FTM_OldPath = `substitute "/*$" $FTM_OldPath ""`;
+	//Get the right path.
+	string $FTM_RightPath = `toNativePath ($FTM_OldPath + "/")`;
+	return $FTM_RightPath;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Get the right format of input file's fullname (including path) to match current OS.
+// Return a string array, the first element is the right format of the input file's
+// fullname (including path), the second element is the shortname of input file (without path).
+//
+proc string[] FTM_GetFile (string $FTM_OldFullPath)
+{
+	string $FTM_RightPath[];
+	string $FTM_PathElements[];
+	int $FTM_PathElementsSize;
+	// fullname
+	$FTM_RightPath[0] = `toNativePath $FTM_OldFullPath`;
+	$FTM_OldFullPath = `fromNativePath $FTM_OldFullPath`;
+	$FTM_PathElementsSize = `tokenize $FTM_OldFullPath "/" $FTM_PathElements`;
+	$FTM_RightPath[1] = $FTM_PathElements[$FTM_PathElementsSize - 1];
+	return $FTM_RightPath;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Analyse all the file texture nodes in current scene.
+//
+proc string[] FTM_FileTextureAnalyst ()
+{
+// All the file texture nodes maybe point to texture files in different paths(folders).
+// Here I use  "group" to indicate different paths , which means there are n "groups" of
+// different paths if the file texture nodes point to files in n different paths.
+
+// The trick is to have an string array $FTM_Groups[], within which every element has corresponding
+// path and nodes point to that path concatenated togather with a "*", which can not appear in path or name.
+// Every element has a style of "path*node1*node2*node3..."
+// Leave $FTM_Groups[0] for empty path, which means node's texture file was not specified.
+// Leave $FTM_Groups[1] for files without path, which means only texture file's short name was presented but path info was missing.
+
+	// All the file texture nodes found in current scene.
+	string $FTM_Files[] = getAllPicNodeArray(0);
+	
+	// Different groups.
+	string $FTM_Groups[];
+	int $FTM_GroupsSize;
+	if (size($FTM_Files)){
+		$FTM_Groups[0] = "FTM_EmptySocket_FTM";
+		$FTM_Groups[1] = "FTM_MissingPathSocket_FTM";
+	}
+
+	// Figure out how many "groups" there are in current scene, and put each file texture node
+	// into proper "group".
+	for ($eachFile in $FTM_Files)
+	{
+		$FTM_GroupsSize = size($FTM_Groups);
+		// Get the path of current file texture node
+		string $attr = getFirstRefFileAttr(`nodeType $eachFile`);
+        if($attr==""&&`nodeType $eachFile`=="movie"){
+            $attr = "fileTextureName";
+        }
+        print("\nFTM_FileTextureAnalyst " + $eachFile + "." + $attr);
+		string $FTM_CurrentFullPath = `getAttr ($eachFile + "." + $attr)`;
+		string $FTM_CurrentPath = dirname ($FTM_CurrentFullPath);
+
+		// File texutre was specified.
+		if (size($FTM_CurrentPath))
+		{
+			// Compare current path to all "groups" have been found. If matches then append current node
+			// to current "group" and exist the compare loop immediately.
+			// Remember that socket [0] is kept for nodes without texture file specified
+			// Remember that socket [1] is kept for nodes with texture file specified but with the path info missing
+			for ($j=2; $j<$FTM_GroupsSize; $j++)
+			{
+				string $buffer[];
+				tokenize $FTM_Groups[$j] "*" $buffer;
+				// Get the path of current "group".
+				string $FTM_OldPath =  $buffer[0];
+				// Compare current path to all "groups" have been found.
+				if ($FTM_CurrentPath == $FTM_OldPath)
+				{
+					// Append current node to current group
+					string $tmp = $FTM_Groups[$j];
+					$tmp += "*" + $eachFile;
+					$FTM_Groups[$j] = $tmp;
+					break;
+				}
+			}
+			// No "group" matches means new "group" was found.
+			if ($j >= $FTM_GroupsSize)
+			{
+				// Create a new "group" and append current file texure node.
+				$FTM_Groups[$FTM_GroupsSize] = $FTM_CurrentPath + "*" + $eachFile;
+				continue;
+			}
+		}
+		// File texture was specified but the path info was missing
+		else if (size($FTM_CurrentFullPath)){
+			string $tmp = $FTM_Groups[1];
+			$tmp += "*" + $eachFile;
+			$FTM_Groups[1] = $tmp;
+		}
+		// File texture was not specified yet. Append current node to the first socket of groups
+		else{
+			string $tmp = $FTM_Groups[0];
+			$tmp += "*" + $eachFile;
+			$FTM_Groups[0] = $tmp;
+		}
+	}
+	select -cl;
+	return $FTM_Groups;
+}
+
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+//
+// Edit the UI Controls after they've been built
+//
+proc FTM_EditUIControl (string $FTM_OptionColumn, string $FTM_HelpForm)
+{
+// Operation mode
+	radioButtonGrp -e -on1 ("textFieldButtonGrp -e -en 0 -tx \"\" " + $FTM_OptionColumn + "|FTM_SourceDirectoryField")
+			-on2 ("textFieldButtonGrp -e -en 1 -tx \"\" " + $FTM_OptionColumn + "|FTM_SourceDirectoryField")
+			($FTM_OptionColumn + "|FTM_OperationMode");
+// Set source directory
+	textFieldButtonGrp -e -bc ("FTM_BrowseCmd \"file\" \"" + $FTM_OptionColumn + "|FTM_SourceDirectoryField\" \"Set_S.D.\" 0")
+			($FTM_OptionColumn + "|FTM_SourceDirectoryField");
+// Set target directory
+	textFieldButtonGrp -e -bc ("FTM_BrowseCmd \"path\" \"" + $FTM_OptionColumn + "|FTM_TargetDirectoryField\" \"Set_T.D.\" 4")
+			($FTM_OptionColumn + "|FTM_TargetDirectoryField");
+// Make new folder
+	checkBoxGrp -e -on1 ("textFieldGrp -e -en 1 -text \"\" " + $FTM_OptionColumn + "|FTM_NewFolderNameField")
+			-of1 ("textFieldGrp -e -en 0 -text \"MyTextureFiles\" " + $FTM_OptionColumn + "|FTM_NewFolderNameField")
+			($FTM_OptionColumn + "|FTM_MakeFolderChecker");
+// Add prefix
+	checkBox -e -onc ("textField -e -en 1 -text \"\" " + $FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_PrefixField")
+			-ofc ("textField -e -en 0 -text \"prefix_\" " + $FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_PrefixField")
+			($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_AddPrefixChecker");
+// Add suffix
+	checkBox -e -onc ("textField -e -en 1 -text \"\" " + $FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_SuffixField")
+			-ofc ("textField -e -en 0 -text \"_suffix\" " + $FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_SuffixField")
+			($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_AddSuffixChecker");
+// Replace string
+	checkBoxGrp -e -on1 ("textFieldGrp -e -en 1 -text \"\" " + $FTM_OptionColumn + "|FTM_OldStringField; textFieldGrp -e -en 1 -text \"\" " + $FTM_OptionColumn + "|FTM_NewStringField")
+			-of1 ("textFieldGrp -e -en 0 -text \"OldString\" " + $FTM_OptionColumn + "|FTM_OldStringField; textFieldGrp -e -en 0 -text \"NewString\" " + $FTM_OptionColumn + "|FTM_NewStringField")
+			($FTM_OptionColumn + "|FTM_ReplaceStringChecker");
+
+// Help description field
+	string $FTM_HelpDescription = "\n[Description]:\n";
+		$FTM_HelpDescription += "  File Texture Manager works on Windows/IRIX/Linux/MAC, manages file textures in a very handy way.\n";
+		$FTM_HelpDescription += "  FTM basic functions:\n";
+		$FTM_HelpDescription += "  1. Analyse scene file textures.\n";
+		$FTM_HelpDescription += "  2. Copy or move the original texture files to user defined path.\n";
+		$FTM_HelpDescription += "  3. Update file textures' path.\n";
+		$FTM_HelpDescription += "  FTM extra functions:\n";
+		$FTM_HelpDescription += "  1. Substitute file texture path's root string. eg. redirecting sourceiamges...\n";
+		$FTM_HelpDescription += "  2. Setup/Cancel BOT for file textures according to their resolution. Textures larger than Threshold in either direction (x/y) will be set to use BOT (corresponding BOT files will be generated automatically) in setup mode. All textures smaller than threshold in both direction (x/y) will be set to use no BOT in cancel mode.\n";
+		$FTM_HelpDescription += "  3. Set filter type to specified type for selected file nodes.\n";
+		$FTM_HelpDescription += "  4. Convert texture file format from \"From\" to \"To\" for selected file nodes. If \"From\" is not \"*\", only file nodes whose texture files format match \"From\" will be handled. For file nodes use image sequence as texture files, the range for conversion need to be specified, so only print out corresponding commands instead of really do the jobs. This function use Maya \"imgcvt\" ultility to do the conversion, make sure the path to it exists in your OS's path env.\n\n";
+		$FTM_HelpDescription += "[Work Flow]:\n";
+		$FTM_HelpDescription += "  Step 1. Analyse scene file textures.(optional)\n";
+		$FTM_HelpDescription += "  Step 2. Select scene file textures (nodes) you want to manage by checking on the related checkers in the UI. You can also do this by your own method, Eg. select them in Hypershade.\n";
+		$FTM_HelpDescription += "  Step 3. Set options as needed.\n";
+		$FTM_HelpDescription += "  Step 4. Do copy, move or set by pressing related button.\n\n";
+		$FTM_HelpDescription += "[Tips]:\n";
+		$FTM_HelpDescription += "  1. Always keep 2 different version for each texture file. Eg. \"abc_LowRes.tga\" is in low resolution while \"abc_HighRes.tga\" is in high resolution. Do your job using low-res textures to speed the interactant. Just remember to use FileTextureManager to reset each file texture to point to the related high-res texture before rendering. (Add prefix, add suffix or even replace string.)\n";
+		$FTM_HelpDescription += "  2. The FileTextureManager's UI does not update dynamically like what Attribute Editor does, so it is better to re-analyse scene file textures each time you finish an FTM job. This is not necessary if you do not use the Analyse function at all.\n\n";
+		$FTM_HelpDescription += "[Notes]:\n";
+		$FTM_HelpDescription += "  1. Final target directory will be equal to target directory plus new folder, if user decide to make a new folder.\n";
+		$FTM_HelpDescription += "  2. Add suffix function has limitation on the texture file name. To be sure it work as desired, the file name must be in a regular format, Eg. \"filename.ext\", \"filename.[#...#].ext\", \"filename.ext.[#...#]\", etc.\n";
+		$FTM_HelpDescription += "  3. Add prfix, add suffix and replace string can be executed at the same time to each file texture. Replace string is caculated first, then add suffix, and add prefix last.\n";
+		$FTM_HelpDescription += "  4. It is highly recommended not to contain \".\" in prefix, suffix, old string and new string.\n";
+		$FTM_HelpDescription += "  5. Sometimes process fails. The reason may be various. The most possible reason could be one of or both the following two: a. Texture file is not found in the source directory; b. Permission denied on reading or writing or deleting.\n\n";
+		$FTM_HelpDescription += "[Details]:\n";
+		$FTM_HelpDescription += "  1. Analysing scene file textures let you know how many file textures there are in the scene, where there are, whether they exist or not, etc. It also allows user select all the texture files point to same path by only one simple click.\n";
+		$FTM_HelpDescription += "  2. How to choose operation mode depends on different source directory status. If file is there where it point to, use Automatic mode, otherwise use Manual mode.\n";
+		$FTM_HelpDescription += "  3. Other functions are pretty definite as marked in the UI.\n";
+
+	scrollField -e -text $FTM_HelpDescription ($FTM_HelpForm + "|FTM_HelpField");
+}
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//
+// judge if the input string is format extension, sequence or just part of file basename
+//
+proc int FTM_FCWhatIs(string $string)
+{
+int $isWhat;
+// 0 - format extension
+// 1 - sequence number
+// 2 - nothing, is just file basename
+// 3 - bot
+global string $FTM_FCAllFormats[];
+$string = tolower($string);
+
+if (stringArrayCount($string,$FTM_FCAllFormats))
+	$isWhat = 0;
+else if (size(match("[0-9]*",$string)) == size($string))
+	$isWhat = 1;
+else if ($string == "bot")
+	$isWhat = 3;
+else
+	$isWhat = 2;
+
+return $isWhat;
+}
+
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+//
+// judge texture file format, only according to the possible extension name
+//
+proc string[] FTM_FCFileRegularName(string $file)
+{
+string $fileRegularName[] = stringToStringArray(basename($file,""),".");
+// try to make it like below
+// [0] - file name
+// [1] - the sequency number if presented, or ""
+// [2] - the extension if presented, or ""
+
+string $fileName;
+string $seqNum;
+string $fileFormat;
+
+switch (size($fileRegularName))
+	{
+	case 0: // sick!!!
+	break;
+	case 1:// only file name presented
+		$fileName = $fileRegularName[0];
+	break;
+	case 2:// the second/last element could be sequence number, format extension or nothing;
+		if (FTM_FCWhatIs($fileRegularName[1]) == 0)
+			{
+			$fileName = $fileRegularName[0];
+			$fileFormat = $fileRegularName[1];
+			}
+		else if (FTM_FCWhatIs($fileRegularName[1]) == 1)
+			{
+			$fileName = $fileRegularName[0];
+			$seqNum = $fileRegularName[1];
+			}
+		else // FTM_FCWhatIs($fileRegularName[1]) = 2, which means the second/last element is just part of file basename, sick!!!
+			$fileName = basename($file,"");
+	break;
+	default: // there are 3 or more pieces. consider the last 2 only.
+		string $lastPiece = $fileRegularName[size($fileRegularName)-1];
+		if (FTM_FCWhatIs($lastPiece) == 0)
+			{
+			$fileFormat = $lastPiece;
+			$fileName = basenameEx($file);
+			// strip the last piece to judge again
+			$lastPiece = $fileRegularName[size($fileRegularName)-2];
+			if (FTM_FCWhatIs($lastPiece) == 1)
+				{
+				$seqNum = $lastPiece;
+				$fileName = basenameEx($fileName);
+				}
+			}
+		else if (FTM_FCWhatIs($lastPiece) == 1)
+			{
+			$seqNum = $lastPiece;
+			$fileName = basenameEx($file);
+			// strip the last piece to judge again
+			$lastPiece = $fileRegularName[size($fileRegularName)-2];
+			if (FTM_FCWhatIs($lastPiece) == 0)
+				{
+				$fileFormat = $lastPiece;
+				$fileName = basenameEx($fileName);
+				}
+			}
+		else if (FTM_FCWhatIs($lastPiece) == 3) //bot
+			{
+			$fileFormat = $fileRegularName[size($fileRegularName)-2] + ".bot";
+			if (size($fileRegularName) == 3)
+				$fileName = $fileRegularName[0];
+			else
+				{
+				$lastPiece = $fileRegularName[size($fileRegularName)-3];
+				if (FTM_FCWhatIs($lastPiece) == 1)
+					{
+					$seqNum = $lastPiece;
+					$fileName = basenameEx(basenameEx(basenameEx($file)));
+					}
+				else
+					$fileName = basenameEx(basenameEx($file));
+				}
+			}
+		else // really sick!!!
+			$fileName = basename($file,"");
+	break;
+	}
+
+$fileRegularName[0] = $fileName;
+$fileRegularName[1] = $seqNum;
+$fileRegularName[2] = $fileFormat;
+
+return $fileRegularName;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// check string $inputString,replace the fisrt (count backwards) matching string $targetPattern with string $newPattern
+//
+proc string FTM_FCSubstituteLastPattern(string $inputString, string $targetPattern, string $newPattern)
+{
+$inputString = fromNativePath($inputString);// avoid to handle "\" in the path
+
+//strip everything behind the last string $targetPattern's existence
+string $exp1 = "^.*" + $targetPattern + "+";
+string $noTail = match($exp1,$inputString);
+
+//replace the last $targetPattern in $noTail with $newPattern
+string $exp2 = $targetPattern + "+$";
+string $newNoEnd = substitute($exp2,$noTail,$newPattern);
+
+//replace $noTail part in $inputString with $newNoEnd
+// substitute all special characters
+string $badChar[] = {"+",".","^","$","[","]","(",")"};
+for ($char in $badChar)
+	$noTail = `substituteAllString $noTail $char ("\\"+$char)`;
+string $exp3 = "^" + $noTail + "+";//take care of "\", so encode string.
+string $outputString = substitute($exp3,$inputString,$newNoEnd);
+
+$outputString = toNativePath($outputString);
+return $outputString;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// to analyse the number of digits for input filename
+//
+proc int FTM_FCDigitsNumber(string $fileName)
+{
+string $fileRegularName[] = FTM_FCFileRegularName($fileName);
+$fileName = FTM_FCSubstituteLastPattern($fileName,$fileRegularName[1],"*");
+string $filesInSeq[] = `getFileList -fs $fileName`;
+
+int $digiNum = 100; // 100 is long enough because no file will have 100 digits in the name!
+for ($i=0;$i<size($filesInSeq);$i++)
+	{
+	string $tmp[] = FTM_FCFileRegularName($filesInSeq[$i]);
+	if ($digiNum >= size($tmp[1]))
+		$digiNum = size($tmp[1]);
+	}
+
+return $digiNum;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// the file format converter
+//
+proc FTM_FCGo(int $progressUI, string $sourceFormatUI, string $targetFormat, int $handleSeq, int $updatePath, int $removeOrig)
+//int $progressUI			- need progress UI; 0 - No UI for progress, which is designed for command line uses.
+//string $sourceFormatUI	- format convert from
+//string $targetFormat		- format convert to
+//int $handleSeq			- handle sequence textures; 0 - do not handle sequence textures.
+//int $updatePath			- update path info; 0 - do not update path info.
+//int $removeOrig			- remove original textures; 0 - do not remove original textures.
+{
+    string $fileNodes[] = getAllPicNodeArray(1);
+if (FTM_SelCheck($fileNodes)) {// if (0)
+	waitCursor -state on;
+	FTM_Log "start" "" "";
+	// list for file nodes to be handled
+	string $fileNodesList[] = FTM_FCGetMatches($sourceFormatUI);
+
+	int $isSeq[];// if it is using an image sequence as texture
+	int $isOneOfSeq[];// if it is using only one image of a whole sequence as texture.
+
+
+	string $file;// current file to be converted
+	string $fileFC;// current file in suitable naming for FC use
+	string $fileUpdatePath;// current file in suitable naming for updatePath use
+	string $fileRemove;// current file in proper naming for removing
+
+	// build progress feedback only in UI mode
+	if ($progressUI) {
+		// base of progress feedback setup
+		int $progress = 0;
+		int $percentage = 0;
+		progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max `size($fileNodesList)`;
+	}
+
+	// executes cooresponding commands for each file node specified.
+	// the core process.
+	for ($i=0;$i<size($fileNodesList);$i++){ //for loop (1)
+		FTM_Log "" ($fileNodesList[$i]+":") "";
+		// build progress feedback only in UI mode
+		if ($progressUI){
+			// Check if the dialog has been cancelled
+			if ( `progressWindow -q -ic` ){
+				FTM_Log "" "User cancelled." "";
+				break;
+			}
+			$progress = $i+1;
+			$percentage = $progress * (100/size($fileNodesList));
+			progressWindow -e -pr $progress -st ("Handling " + $fileNodesList[$i] + "     ......  " + $percentage + "%");
+		}
+		
+		string $attr = getFirstRefFileAttr(`nodeType $fileNodesList[$i]`);
+		string $FTM_CurrentFullPath = `getAttr ($fileNodesList[$i] + "." + $attr)`;
+		$file = toNativePath($FTM_CurrentFullPath);
+		$fileFC = $file;
+		$fileRemove = $file;
+		string $fileRegularName[] = FTM_FCFileRegularName($file);
+		string $isBOT = `match "bot" $fileRegularName[2]`;
+		if (size($isBOT)) {
+			FTM_Log "" "Texture file is a BOT file. Skipped!" "";
+			continue;
+		}
+		string $targetFile = FTM_FCSubstituteLastPattern($file,$fileRegularName[2],$targetFormat);
+
+		// it is bad that a file has no extension to indicate its format, so add one if needed.
+		if (!size($fileRegularName[2]))
+			$targetFile += "." + $targetFormat;
+		$fileUpdatePath = $targetFile;
+
+		// skip all process if the file node was already handled before.
+		if(toNativePath(tolower($fileUpdatePath)) == toNativePath(tolower($fileRemove)))
+			FTM_Log "" "" "This file node was already handled before. Process skipped.";
+
+		else{ //else (1)
+			$isSeq[$i] = 0;
+			$isOneOfSeq[$i] = 0;
+			if(`nodeType $fileNodesList[$i]` == "file"){
+    			if (size($fileRegularName[1])) {
+    				if (`getAttr ($fileNodesList[$i] + ".useFrameExtension")`)
+    					$isSeq[$i] = 1;
+    				else
+    					$isOneOfSeq[$i] = 1;
+    			}
+			}
+
+			//commands to execute
+			string $cmdFC = "system(\"imgcvt ";
+//			if (size($fileRegularName[2]))
+//				$cmdFC += "-f " + $fileRegularName[2] + " ";
+			$cmdFC += "-t " + $targetFormat; // FC command
+			string $cmdUpdatePath = "";
+			$cmdUpdatePath = "setAttr -typ \"string\" " + $fileNodesList[$i] + "." + $attr +" ";
+			string $cmdRemoveOrig = "sysFile -del \"";
+
+			if (!$handleSeq && $isSeq[$i])
+				FTM_Log "" "" "Sequence was not selected to be handled. Skipped.";
+			else { //else (2)
+				// need to handle sequence textures
+				if ($handleSeq && $isSeq[$i]){
+					string $padding = "";
+					for ($j=0;$j<FTM_FCDigitsNumber($file);$j++)
+						$padding += "@";
+					$targetFile = FTM_FCSubstituteLastPattern($targetFile,$fileRegularName[1],$padding);
+					$fileFC = FTM_FCSubstituteLastPattern($file,$fileRegularName[1],$padding);
+					$fileRemove = FTM_FCSubstituteLastPattern($file,$fileRegularName[1],"*");
+
+					//command for sequence
+					$cmdFC += " -n startIn endIn stepIn -N startOut endOut stepOut";
+				}
+				$cmdFC += " \\\"" + encodeString($fileFC) + "\\\" \\\"" + encodeString($targetFile) + "\\\"\")";
+
+				// only do the convertion when target file doesn't exist,
+				// or convertion has been done before for other file node that shares the same texture.
+				if (`file -q -ex $fileUpdatePath`)
+					FTM_Log "" "" "Convertion skipped. New format texture exists, maybe convertion has been done before.";
+				else{ //else (3)
+					if (!$isSeq[$i]){
+						// system feedback
+						string $cmdFCFeedback = eval($cmdFC);
+						if (size($cmdFCFeedback))
+							FTM_Log "" "" $cmdFCFeedback;
+						if (`file -q -ex $fileUpdatePath`)
+							FTM_Log "" "" ("Convertion succeeded. Converted from \"" + $fileFC + "\" to \"" + $targetFile + "\".");
+						else
+							FTM_Log "" "" "Convertion failed. Could be file permission problem, disk capacity problem or source texture is of unknown/unsupported format.";
+					}
+					else// for sequence, only print out command to execute.
+						FTM_Log "" "" ("Sequence specified. Command to execute (format conversion):" + $cmdFC);
+				}// else (3)
+
+				// need to update path info
+				if ($updatePath) {// if (1)
+					$cmdUpdatePath += "\"" + encodeString(toNativePath($fileUpdatePath)) + "\";";
+					$cmdRemoveOrig += encodeString($fileRemove) + "\";";
+
+					if (!$isSeq[$i]){// if (2)
+						if (`file -q -ex $fileUpdatePath`){ // if (3)
+							if(catchQuiet(eval($cmdUpdatePath))) {
+								FTM_Log "" "" "WARNING: Attribute \"fileTextureName\" is locked/connected and can NOT be modified!";
+								FTM_Log "" "" "WARNING: Attribute \"texture\" is locked/connected and can NOT be modified!";
+								FTM_Log "" "" "WARNING: Path updating failed. So Original Texture Removing will not be done even if it was selected to.";
+							}
+							else {// else (3)
+								FTM_Log "" "" ("Path updating succeeded. Set to \"" + toNativePath($fileUpdatePath) + "\".");
+								// need to remove old textures
+								// only remove old textures when updatePath is selected and updating succeeds
+								if ($removeOrig){ //if (4)
+									if ($isOneOfSeq[$i])
+										FTM_Log "" "" "Only one file of a whole sequence is used as texture, no file in the sequence is supposed to be removed.";
+									else if (!$isSeq[$i]){ // else if (1)
+										if (!eval($cmdRemoveOrig))
+											FTM_Log "" "" "Original texture removing failed, could be file permission problem.";
+										else
+											FTM_Log "" "" ("Original texture removing succeeded. Removed \"" + $fileRemove + "\".");
+									} // else if (1)
+								} // if (4)
+							}// else (3)
+						} // if (3)
+						else
+							FTM_Log "" "" "Convertion failed, Path Updating and Original Texture Removing will not be done even if they were selected to.";
+					} // if (2)
+					// for sequence, only print out command to execute
+					else { //else (4)
+						FTM_Log "" "" ("Sequence specified. Command to execute (update path info):" + $cmdUpdatePath);
+						if ($removeOrig)
+							FTM_Log "" "" ("Sequence specified. Command to execute (remove original textures):" + $cmdRemoveOrig);
+					}// else (4)
+				} // if (1)
+			} //else (2)
+		} // else(1)
+	} // for loop (1)
+
+	// feedback ends
+	if (!size($fileNodesList))
+		FTM_Log "" "No texture is of specified format." "";
+
+	// build progress feedback only in UI mode
+	if ($progressUI){
+		// finish progress feed back
+		progressWindow -ep;
+		FTM_Log "end" "" "";
+		// job done
+		FTM_END;
+	}
+	waitCursor -state off;
+} // if (0)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// analyse all possible file nodes to find out those match user's specification
+//
+global proc string[] FTM_FCGetMatches (string $formatUI)
+{
+string $fileNodesList[]; // list for file nodes to be handled
+
+string $tmpNodesList[] = getAllPicNodeArray(1);
+//string $tmpNodesList[] = `ls -sl -typ "file"`; // list for all (selected) file nodes, which need to be analyse.
+if (`FTM_SelCheck $tmpNodesList`) {
+	string $tmpNode; // each single file node in the list
+	string $tmpFile; // file that $tmpNode point to.
+
+	string $format = `optionMenu -q -v $formatUI`;
+	if ($format!="*") {// format from specified, so only handle files with that format
+		for ($tmpNode in $tmpNodesList)	{
+			string $attr = getFirstRefFileAttr(`nodeType $tmpNode`);
+			string $tmpFile = `getAttr ($tmpNode + "." + $attr)`;
+			string $tmpFileRegularName[] = FTM_FCFileRegularName($tmpFile);
+			if (tolower($tmpFileRegularName[2]) == tolower($format))// extension matches, this file node need to be handled
+				$fileNodesList[size($fileNodesList)] = $tmpNode;
+		}
+	}
+	else // "*" was selected as format from, which means to handle all (selected) file nodes
+		$fileNodesList = $tmpNodesList;
+}
+return $fileNodesList;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// info transfer, just to make sure FTM_FCGo can be run in command line.
+//
+global proc FTM_FCGatherInfo(string $FTM_ExtraFunctionColumn)
+{
+string $sourceFormatUI = $FTM_ExtraFunctionColumn + "|FTM_FCRow|FTM_FCSourceMenu";
+string $targetFormat = `optionMenu -q -v ($FTM_ExtraFunctionColumn + "|FTM_FCRow|FTM_FCTargetMenu")`;
+int $handleSeq = `checkBox -q -v ($FTM_ExtraFunctionColumn + "|FTM_SeqCheck")`;
+int $updatePath = `checkBox -q -v ($FTM_ExtraFunctionColumn + "|FTM_UpdateCheck")`;
+int $removeOrig = `checkBox -q -v ($FTM_ExtraFunctionColumn + "|FTM_RemoveCheck")`;
+
+FTM_FCGo 	1
+		$sourceFormatUI
+		$targetFormat
+		$handleSeq
+		$updatePath
+		$removeOrig;
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//
+// Command for Filter Setup
+//
+global proc FTM_FilterSetup(string $FTM_ExtraFunctionColumn)
+{
+string $Nodes[] = `ls -sl -typ "file"`;
+if (`FTM_SelCheck $Nodes`) {
+	waitCursor -state on;
+	FTM_Log "start" "" "";
+	int $filterType = `optionMenu -q -sl ($FTM_ExtraFunctionColumn+"|FTM_FilterTypeRow|FTM_FilterTypeMenu")` -1;
+	string $filter = `optionMenu -q -v ($FTM_ExtraFunctionColumn+"|FTM_FilterTypeRow|FTM_FilterTypeMenu")`;
+
+	int $progress = 0;
+	int $percentage = 0;
+	progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max `size $Nodes`;
+
+	for ($i=0;$i<size($Nodes);$i++) {
+		FTM_Log "" ($Nodes[$i]+":") "";
+		if ( `progressWindow -q -ic` ){
+			FTM_Log "" "User cancelled." "";
+			break;
+		}
+		$progress = $i;
+		$percentage = $progress * 100 / size($Nodes);
+		progressWindow -e -pr $progress -st ("Setting filter type, please wait......      " + $percentage + "%");
+
+		string $cmd = "setAttr " + $Nodes[$i] + ".filterType " + $filterType;
+		if (catchQuiet(eval($cmd)))
+			FTM_Log "" "" "Attribute \"filterType\" is locked/connected and can NOT be modified!";
+		else
+			FTM_Log "" "" ("Set filter type to \"" + $filter + "\"");
+	}
+	progressWindow -ep;
+	FTM_Log "end" "" "";
+	FTM_END;
+	waitCursor -state off;
+}
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//
+// Command for BOT setup
+//
+global proc FTM_BOTSetup(int $FTM_BOTMode, string $FTM_ExtraFunctionColumn)
+//$FTM_BOTMode		-	1 Setup
+//					-	0 Cancel
+{
+string $FTM_FileNodes[]=`ls -sl -typ file`;
+if (`FTM_SelCheck $FTM_FileNodes`) {
+	waitCursor -state on;
+	FTM_Log "start" "" "";
+	int $progress = 0;
+	int $percentage = 0;
+	progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max `size $FTM_FileNodes`;
+
+	for ($i=0; $i<size($FTM_FileNodes); $i++){
+		FTM_Log "" ($FTM_FileNodes[$i]+":") "";
+		if ( `progressWindow -q -ic` ){
+			FTM_Log "" "User cancelled." "";
+			break;
+		}
+		$progress = $i;
+		$percentage = $progress * 100 / size($FTM_FileNodes);
+		progressWindow -e -pr $progress -st ("Setting BOT options, please wait......      " + $percentage + "%");
+
+		// Do not handle sequence textures
+		if (`getAttr ($FTM_FileNodes[$i] + ".useFrameExtension")`) {
+			FTM_Log "" "" "Sequence specified, Skipped!";
+			continue;
+		}
+
+		int $resolution = `intFieldGrp -q -v1 ($FTM_ExtraFunctionColumn + "|FTM_BOTRow|FTM_BOTResFieldGrp")`;
+		float $xRes = `getAttr ($FTM_FileNodes[$i] + ".outSizeX")`;
+		float $yRes = `getAttr ($FTM_FileNodes[$i] + ".outSizeY")`;
+
+		if ($FTM_BOTMode) {// Setup
+			if ($xRes >= $resolution || $yRes >= $resolution) {
+				string $FTM_File = `getAttr ($FTM_FileNodes[$i] + ".fileTextureName")`;
+				$FTM_File = `fromNativePath $FTM_File`;
+				string $FTM_TheBOT = `substitute "(\\.bot)*$" $FTM_File ""` + ".bot";
+				string $BOTCmd = "makebot -c  -r " + $resolution + " -i \"" + $FTM_File + "\" -o \"" + $FTM_TheBOT + "\"";
+				if (catchQuiet(eval($BOTCmd)))
+					FTM_Log "" "" "BOT file generation failed. Could be permission issue or the BOT file already exists.";
+				string $cacheCmd = "setAttr " + $FTM_FileNodes[$i] + ".useCache 1";
+				string $path = `fromNativePath $FTM_TheBOT`;
+				string $pathCmd = "setAttr -typ \"string\" " + $FTM_FileNodes[$i] + ".fileTextureName \"" + $path + "\"";
+				if (catchQuiet(eval($cacheCmd)))
+					FTM_Log "" "" "WARNING: Attribute \"useCache\" is locked/connected and can NOT be modified!";
+				else if (catchQuiet(eval($pathCmd)))
+					FTM_Log "" "" "WARNING: Attribute \"fileTextureName\" is locked/connected and can NOT be modified!";
+				else
+					FTM_Log "" "" "BOT setup OK.";
+			}
+			else
+				FTM_Log "" "" ("Resolution \"" + $xRes + "x" + $yRes + "\" is LOWER than specified threshold, skipped!");
+		}
+		else {// Cancel
+			if ($xRes <= $resolution && $yRes <= $resolution) {
+				string $cacheCmd = "setAttr " + $FTM_FileNodes[$i] + ".useCache 0";
+				string $FTM_File = `getAttr ($FTM_FileNodes[$i] + ".fileTextureName")`;
+				$FTM_File = `fromNativePath $FTM_File`;
+				$FTM_File = `substitute "(\\.bot)*$" $FTM_File ""`;
+				string $pathCmd = "setAttr -typ \"string\" " + $FTM_FileNodes[$i] + ".fileTextureName \"" + $FTM_File + "\"";
+				if (catchQuiet(eval($cacheCmd)))
+					FTM_Log "" "" "WARNING: Attribute \"useCache\" is locked/connected and can NOT be modified!";
+				else if (catchQuiet(eval($pathCmd)))
+					FTM_Log "" "" "WARNING: Attribute \"fileTexturename\" is locked/connected and can NOT be modified!";
+				else
+					FTM_Log "" "" "BOT cancelled successfully.";
+			}
+			else
+				FTM_Log "" "" ("Resolution \"" + $xRes + "x" + $yRes + "\" is HIGHER than specified threshold, skipped!");
+		}
+	}
+	progressWindow -ep;
+	FTM_Log "end" "" "";
+	FTM_END;
+	waitCursor -state off;
+}
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//
+// Command for substitute path root
+//
+global proc FTM_Substitute(string $oldRootField, string $newRootField)
+{
+string $oldRoot = `textFieldButtonGrp -q -text $oldRootField`;
+$oldRoot = fromNativePath($oldRoot);
+string $newRoot = `textFieldButtonGrp -q -text $newRootField`;
+$newRoot = fromNativePath($newRoot);
+if (size($oldRoot)==0 || size($newRoot)==0)
+	confirmDialog -t "File Texture Manager" -m "Both the Old Root filed and the New Root field must be filled!" -b "OK";
+else {
+    string $fileNodes[] = getAllPicNodeArray(1);
+    
+	if (`FTM_SelCheck $fileNodes`){
+		waitCursor -state 1;
+		FTM_Log "start" "" "";
+		// substitute all special characters
+		string $badChar[] = {"+",".","^","$","[","]","(",")"};
+		for ($char in $badChar)
+			$oldRoot = `substituteAllString $oldRoot $char ("\\"+$char)`;
+
+		string $node;
+
+		int $progress = 0;
+		int $percentage = 0;
+		progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max `size $fileNodes`;
+
+		for ($i=0;$i<size($fileNodes);$i++) {
+			FTM_Log "" ($fileNodes[$i]+":") "";
+			if ( `progressWindow -q -ic` ){
+				FTM_Log "" "User cancelled." "";
+				break;
+			}
+			$progress = $i;
+			$percentage = $progress * 100 / size($fileNodes);
+			progressWindow -e -pr $progress -st ("Redirecting, please wait......      " + $percentage + "%");
+
+			string $attr = getFirstRefFileAttr(`nodeType $fileNodes[$i]`);
+			string $old = `getAttr ($fileNodes[$i] + "." + $attr)`;
+			$old = fromNativePath($old);
+			string $new = `substitute $oldRoot $old $newRoot`;
+			
+			string $cmd = "setAttr -typ \"string\" " + $fileNodes[$i] + "." + $attr + " \"" + fromNativePath($new) + "\"";
+			if (catchQuiet(eval($cmd)))
+					FTM_Log "" "" ("WARNING: Attribute \"" + $attr + "\" is locked/connected and can NOT be modified!");
+			else
+				FTM_Log "" "" ("Set to \"" + toNativePath($new) + "\"");
+
+			if (!`file -q -ex $new`)
+				FTM_Log "" "" ("WARNING: \"" + toNativePath($new) + "\" doesn't exist!");
+		}
+		progressWindow -ep;
+		FTM_Log "end" "" "";
+		FTM_END;
+		waitCursor -state 0;
+	}
+}
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//
+// Command executed when "Analyse Scene File Textures" button pressed.
+//
+global proc FTM_AnalyseFileTextures (string $FTM_ParentUI)
+{
+	waitCursor -state on;
+
+	string $FTM_Groups[] = `FTM_FileTextureAnalyst`;
+
+	// Make sure the corresponding UI uniqe.
+	if (`columnLayout -q -ex ($FTM_ParentUI + "|FTM_AnalysisCheckerColumn")`)
+		deleteUI ($FTM_ParentUI + "|FTM_AnalysisCheckerColumn");
+
+	if (size($FTM_Groups) == 0)
+		text -e -l "No file textures found!" ($FTM_ParentUI + "|FTM_EmptyAnalysisText");
+	else
+	{
+		text -e -l "Analysis:" ($FTM_ParentUI + "|FTM_EmptyAnalysisText");
+		setParent $FTM_ParentUI;
+		columnLayout FTM_AnalysisCheckerColumn;
+		int $FTM_Groups_Size = size($FTM_Groups);
+		if ($FTM_Groups[0] == "FTM_EmptySocket_FTM")
+			$FTM_Groups_Size -= 1;
+		if ($FTM_Groups[1] == "FTM_MissingPathSocket_FTM")
+			$FTM_Groups_Size -= 1;
+		string $FTM_TotalResults = "Total " + size(getAllPicNodeArray(0)) + " file textures point to " + $FTM_Groups_Size + " (different) path(s) : ";
+		text -l $FTM_TotalResults;
+		text -l "" -h 10;
+
+		// Analyse each file in each "group".
+		for ($FTM_Group in $FTM_Groups)
+		{
+			string $buffer[];
+			tokenize $FTM_Group "*" $buffer;
+			int $FTM_FilesStoredSize = size ($buffer)-1;
+			string $FTM_CurrentPath = $buffer[0];
+
+			string $FTM_FileTexturesAnalysis = "";
+			// File texture not specified yet. In other words, empty file texture nodes.
+			if ($FTM_CurrentPath=="FTM_EmptySocket_FTM" && $FTM_FilesStoredSize>0)
+				$FTM_FileTexturesAnalysis = $FTM_FilesStoredSize + " texture(s) NOT specified. So they are NOT exist(s).";
+			// File texture specified, but no path information.
+			else if ($FTM_CurrentPath=="FTM_MissingPathSocket_FTM" && $FTM_FilesStoredSize>0)
+				$FTM_FileTexturesAnalysis = $FTM_FilesStoredSize + " texture(s) have no path information. So they are NOT exist(s).";
+			// Normal status.
+			else
+			{
+				if ($FTM_FilesStoredSize>0){
+					// Correct the path format for current OS.
+					$FTM_CurrentPath = `FTM_GetPath "path" $FTM_CurrentPath`;
+					$FTM_FileTexturesAnalysis = $FTM_FilesStoredSize + " texture(s) point to === \" " + $FTM_CurrentPath + " \".";
+				}
+			}
+			// Queue the names of the files stored in current "group" for later quick selecting.
+			string $FTM_CurrentFile[];
+			string $FTM_CurrentFiles = "";
+			// Strings used to hold files exist or notExist.
+			string $FTM_Exist[] = {};
+			int $FTM_ExistSize = 0;
+			string $FTM_NotExist[] = {};
+			int $FTM_NotExistSize = 0;
+
+			for ($i=1; $i<size($buffer); $i++)
+			{
+				// Store the names of files in current "group".
+				$FTM_CurrentFile[$i] = $buffer[$i];
+				$FTM_CurrentFiles = $FTM_CurrentFiles + $FTM_CurrentFile[$i] + " ";
+
+				// Check if the file exsist or not, then asign the name to responding variable.
+				string $attr = getFirstRefFileAttr(`nodeType $FTM_CurrentFile[$i]`);
+                if($attr == "" && nodeType($FTM_CurrentFile[$i]) == "movie"){
+                    $attr = "fileTextureName";
+                }
+				string $FTM_CurrentFilePath = `getAttr ($FTM_CurrentFile[$i] + "." + $attr)`;
+
+				if ( `file -q -ex $FTM_CurrentFilePath`)
+				{
+					$FTM_Exist[$FTM_ExistSize] = $FTM_CurrentFile[$i];
+					$FTM_ExistSize = $FTM_ExistSize + 1;
+				}
+				else
+				{
+					$FTM_NotExist[$FTM_NotExistSize] = $FTM_CurrentFile[$i];
+					$FTM_NotExistSize = $FTM_NotExistSize + 1;
+				}
+			}
+
+			if (size($FTM_FileTexturesAnalysis)) {
+					string $FTM_MainChecker = `checkBox -l $FTM_FileTexturesAnalysis -al left`;
+				// Only build responding sub-checker for the files have path information.
+				string $FTM_ExistSubChecker;
+				string $FTM_NotExistSubChecker;
+				if ($FTM_CurrentPath!="FTM_EmptySocket_FTM"  && $FTM_CurrentPath!="FTM_MissingPathSocket_FTM")
+				{
+					columnLayout -adj 1 -cat left 30;
+						// A list of exist files, which is used for selection.
+						string $FTM_ExistFiles = "";
+						for ($i=0; $i<$FTM_ExistSize; $i++)
+							$FTM_ExistFiles = $FTM_ExistFiles + $FTM_Exist[$i] + " ";
+						$FTM_ExistSubChecker = `checkBox -l ($FTM_ExistSize + " of them exist(s).") -al left
+							-onc ("select -add " + $FTM_ExistFiles) -ofc ("select -deselect " + $FTM_ExistFiles)`;
+
+						// A list of NOT exist files, which is used for selection.
+						string $FTM_NotExistFiles = "";
+						for ($i=0; $i<$FTM_NotExistSize; $i++)
+							$FTM_NotExistFiles = $FTM_NotExistFiles + $FTM_NotExist[$i] + " ";
+						$FTM_NotExistSubChecker = `checkBox -l ($FTM_NotExistSize + " of them NOT exist(s).") -al left
+							-onc ("select -add " + $FTM_NotExistFiles) -ofc ("select -deselect " + $FTM_NotExistFiles)`;
+					setParent ($FTM_ParentUI + "|FTM_AnalysisCheckerColumn");
+
+					// Main checker's onCommand and offCommand should influnce responding subcheckers in this case;
+					checkBox -e -onc ("select -add " + $FTM_CurrentFiles + ";checkBox -e -v 1 -vis 0 " + $FTM_ExistSubChecker + ";checkBox -e -v 1 -vis 0 " + $FTM_NotExistSubChecker)
+						-ofc ("select -deselect " + $FTM_CurrentFiles + ";checkBox -e -v 0 -vis 1 " + $FTM_ExistSubChecker + ";checkBox -e -v 0 -vis 1 " + $FTM_NotExistSubChecker)
+						$FTM_MainChecker;
+				}
+				// Main checker's onCommand and offCommand should NOT influnce responding subcheckers in this case;
+				else
+					checkBox -e -onc ("select -add " + $FTM_CurrentFiles) -ofc ("select -deselect " + $FTM_CurrentFiles) $FTM_MainChecker;
+			}
+		}
+	}
+
+	waitCursor -state off;
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//
+//Comand executed when Browse button pressed.
+//
+global proc FTM_BrowseCmd (string $FTM_FileOrPath, string $FTM_TextField, string $FTM_WhichButton, int $FTM_BrowseType)
+//$FTM_FileOrPath		Pass to FTM_ChangeTextField
+//$FTM_TextField		Pass to FTM_ChangeTextField
+//$FTM_WhichButton		Pass to fileBrowser, which will be the label of the dialog
+//$FTM_BrowseType		Pass to fileBrowser, which will define to get dialog for file or folder
+{
+	global string $FTM_WorkSpace;
+	if (size($FTM_WorkSpace) == 0)
+	{
+		$FTM_WorkSpace = `workspace -q -rd` + `workspace -q -fre "sourceImages"`;
+		$FTM_WorkSpace = `FTM_GetPath "path" $FTM_WorkSpace`;
+	}
+	workspace -dir $FTM_WorkSpace;
+	string $FTM_Temp = "";
+		$FTM_Temp += "FTM_ChangeTextField ";
+		$FTM_Temp += ("\"" + $FTM_FileOrPath + "\" ");
+		$FTM_Temp += ("\"" + $FTM_TextField + "\" ");
+	//print $FTM_Temp; // FTM_ChangeTextField "path" "FTM_MainWindow|formLayout183|tabLayout12|formLayout184|scrollLayout40|columnLayout205|FTM_TargetDirectoryField" 
+    //print "\n";
+    //print $FTM_WhichButton; //Set_T.D.
+    //print "\n";
+    //print $FTM_BrowseType; //4
+    //print "\n";
+    
+    string $filename[] = `fileDialog2 -fileMode 3 -caption "Select Path" -fileFilter "path" -okCaption "Select"`;
+    if (1 == `size($filename)`)
+    {
+        //FTM_ChangeTextField("path","FTM_TargetDirectoryField","D:\\project\\test\\测试0410","")
+        FTM_ChangeTextField($FTM_FileOrPath,$FTM_TextField,$filename[0],"");
+    }
+    
+	//fileBrowser $FTM_Temp $FTM_WhichButton "" $FTM_BrowseType;
+}
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+//
+//The callback command on fileBrowser.
+//
+global proc FTM_ChangeTextField (string $FTM_FileOrPath, string $FTM_TextField, string $FTM_File, string $FTM_FileType)
+//$FTM_FileOrPath	How to deal with the input path , will be pass to FTM_GetPath
+//$FTM_TextField	The name of the control need to be edited
+//$FTM_File			The file specified
+//$FTM_FileType		The file type specified
+{
+	string $FTM_Path = `FTM_GetPath $FTM_FileOrPath $FTM_File`;
+	textFieldButtonGrp -e -text $FTM_Path $FTM_TextField;
+	//Close the dialog for IRIX/Linux.
+	if (`about -os` == "irix" || `about -os` == "linux")
+		window -e -vis false projectViewerWindow;
+
+	global string $FTM_WorkSpace;
+	$FTM_WorkSpace = $FTM_Path;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+// Reset the UI to its initial state.
+//
+global proc FTM_ResetUI (string $FTM_OptionColumn,string $FTM_AnalysisColumn,string $FTM_ExtraFunctionColumn,string $FTM_Tabs,string $FTM_CopyButton,string $FTM_MoveButton,string $FTM_SetButton)
+{
+	waitCursor -state on;
+
+	// The main window;
+	window -e -wh 380 600 FTM_MainWindow;
+
+	// Analyse area
+	text -e -l "Not analysed yet." ($FTM_AnalysisColumn + "|FTM_EmptyAnalysisText");
+
+	if (`columnLayout -q -ex ($FTM_AnalysisColumn + "|FTM_AnalysisCheckerColumn")`)
+		deleteUI ($FTM_AnalysisColumn + "|FTM_AnalysisCheckerColumn");
+
+	// Operation mode
+	radioButtonGrp -e -select 1 ($FTM_OptionColumn + "|FTM_OperationMode");
+	// Source directory field
+	textFieldButtonGrp -e -text "" -en 0 ($FTM_OptionColumn + "|FTM_SourceDirectoryField");
+	// Target directory field
+	string $FTM_CurrentProject = `workspace -q -rd`;
+	string $FTM_CurrentSourceImagesDir = $FTM_CurrentProject + `workspace -q -rte "sourceImages"`;
+	string $FTM_SourceImages = `FTM_GetPath "path" $FTM_CurrentSourceImagesDir`;
+	textFieldButtonGrp -e -text $FTM_SourceImages ($FTM_OptionColumn + "|FTM_TargetDirectoryField");
+	// Make new folder area
+	checkBoxGrp -e -v1 0 ($FTM_OptionColumn + "|FTM_MakeFolderChecker");
+	textFieldGrp -e -text "MyTextureFiles" -en 0 ($FTM_OptionColumn + "|FTM_NewFolderNameField");
+	// Add prefix area
+	checkBox -e -v 0 ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_AddPrefixChecker");
+	textField -e -text "prefix_" -en 0 ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_PrefixField");
+	// Add suffix area
+	checkBox -e -v 0 ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_AddSuffixChecker");
+	textField -e -text "_suffix" -en 0 ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_SuffixField");
+	// Replace string area
+	checkBoxGrp -e -v1 0 ($FTM_OptionColumn + "|FTM_ReplaceStringChecker");
+	textFieldGrp -e -text "OldString" -en 0 ($FTM_OptionColumn + "|FTM_OldStringField");
+	textFieldGrp -e -text "NewString" -en 0 ($FTM_OptionColumn + "|FTM_NewStringField");
+
+	// Extra function tab
+	textFieldButtonGrp -e -text "" ($FTM_ExtraFunctionColumn + "|oldRootField");
+	string $tmp = `workspace -q -rd` + `workspace -q -rte "sourceImages"`;
+	$tmp = `FTM_GetPath "path" $tmp`;
+	textFieldButtonGrp -e -text $tmp ($FTM_ExtraFunctionColumn + "|newRootField");
+	intFieldGrp -e -v1 1024 ($FTM_ExtraFunctionColumn + "|FTM_BOTRow|FTM_BOTResFieldGrp");
+	optionMenu -e -v "Mipmap" ($FTM_ExtraFunctionColumn + "|FTM_FilterTypeRow|FTM_FilterTypeMenu");
+	optionMenu -e -v "\*" ($FTM_ExtraFunctionColumn + "|FTM_FCRow|FTM_FCSourceMenu");
+	optionMenu -e -v "iff" ($FTM_ExtraFunctionColumn + "|FTM_FCRow|FTM_FCTargetMenu");
+	checkBox -e -v 0 ($FTM_ExtraFunctionColumn + "|FTM_SeqCheck");
+	checkBox -e -v 1 ($FTM_ExtraFunctionColumn + "|FTM_UpdateCheck");
+	checkBox -e -v 0 -en 1 ($FTM_ExtraFunctionColumn + "|FTM_RemoveCheck");
+
+	// Return to the first tab
+	tabLayout -e -sti 1 $FTM_Tabs;
+
+	// Reset all bottom function buttons
+	button -e -en 1 $FTM_CopyButton;
+	button -e -en 1 $FTM_MoveButton;
+	button -e -en 1 $FTM_SetButton;
+
+	global string $FTM_WorkSpace;
+	$FTM_WorkSpace = `workspace -q -rd` + `workspace -q -rte "sourceImages"`;
+	$FTM_WorkSpace = `FTM_GetPath "path" $FTM_WorkSpace`;
+
+	select -cl;
+	waitCursor -state off;
+}
+
+global proc addNameArray(string $fileNodeArray[],string $picShortNameArray[],string $fullNameArray[],string $fileParent,string $picParent,string $fullParent)
+{
+    //string $parent = "rcLayout";
+    int $rowHeight = 20;
+    int $fileNodeCount = size($fileNodeArray);
+    int $index;
+    int $picW = `columnLayout -q -w $picParent`;
+    for($index = 0;$index < $fileNodeCount;$index++)
+    {
+        text -l $fileNodeArray[$index] -p $fileParent -h $rowHeight;
+        textField -pht $picShortNameArray[$index] -p $picParent -h $rowHeight -w ($picW - 10);
+        text -l $fullNameArray[$index] -p $fullParent -h $rowHeight;
+    }
+    
+}
+
+global proc getArray(string $coLayout)
+{   
+    global string $changePicNameArray[];
+    clear $changePicNameArray;
+    string $children[] = `columnLayout -q -ca $coLayout`;
+    int $childrenCount = size($children);
+    int $index;
+    for($index = 0;$index < $childrenCount;$index++)
+    {
+    	string $name = `textField -q -text $children[$index]`;
+    	if (size($name)){
+    		//不匹配a.101.jpg的情况！！！
+    		string $buffer[];
+			$numTokens = `tokenize $name "." $buffer`; 
+			if ($numTokens == 1)
+			{
+				string $oldName = `textField -q -pht $children[$index]`;
+				string $nameParts[];
+				$num = `tokenize $oldName "." $nameParts`; 
+				$name = $name + "." + $nameParts[$num - 1];
+			}
+    		
+
+    	}
+        $changePicNameArray[$index] = $name;
+    }
+    layoutDialog -dismiss "done";
+    //if (!`waitCursor -q -state`){
+	//	waitCursor -state on;
+	//}	
+}
+
+
+global proc checkboxPrompt()
+{	
+    string $form = `setParent -q`;
+
+    float $columnWidth = 200;
+    float $formWidth = $columnWidth * 2;
+    float $filebgcValue = 0.5;
+    float $picbgcValue = 0.45;
+    float $titleHeight = 20;
+    
+    formLayout -e -numberOfDivisions 100 -w $formWidth $form ;
+
+    string $titleLayout = `columnLayout -adj 1 -rs 5`;
+    string $t = `text -al "left" -l "以下贴图名字重复：(取消将被覆盖)"`;
+    string $titleFormLayout = `formLayout -numberOfDivisions 100`;
+    string $title1 = `text -l "file" -bgc $filebgcValue $filebgcValue $filebgcValue -h $titleHeight`;
+    string $title2 = `text -l "贴图名字修改为：" -bgc $picbgcValue $picbgcValue $picbgcValue -h $titleHeight`;
+    string $title3 = `text -l "贴图原始路径" -bgc $filebgcValue $filebgcValue $filebgcValue -h $titleHeight`;
+    formLayout -edit
+        -attachForm            $title1   "top"    0
+        -attachForm            $title1   "left"   0
+        -attachForm            $title1   "bottom" 0
+        -attachControl         $title1  "right"    0 $title2
+        -attachForm            $title2   "top"    0
+        -attachControl         $title2  "right"    0 $title3
+        -attachForm            $title2   "bottom" 0
+        -attachPosition        $title2  "left"  0 25
+        -attachForm            $title3   "top"    0
+        -attachForm            $title3   "right"   0
+        -attachForm            $title3   "bottom" 0
+        -attachPosition        $title3  "left"  0 50
+    $titleFormLayout;
+
+    setParent $form;
+    string $scrollLayout = `scrollLayout -childResizable 1`;
+    string $scrollFormLayout = `formLayout -numberOfDivisions 100`;
+    string $c1Layout = `columnLayout -adj 1`;
+    setParent ..;
+    string $c2Layout = `columnLayout -adj 1`;
+    setParent ..;
+    string $c3Layout = `columnLayout -adj 1`;
+    formLayout -edit
+        -attachForm            $c1Layout   "top"    0
+        -attachForm            $c1Layout   "left"   0
+        -attachForm            $c1Layout   "bottom" 0
+        -attachControl         $c1Layout  "right"    0 $c2Layout
+        -attachForm            $c2Layout   "top"    0
+        -attachControl         $c2Layout  "right"    0 $c3Layout
+        -attachForm            $c2Layout   "bottom" 0
+        -attachPosition        $c2Layout  "left"  0 25
+        -attachForm            $c3Layout   "top"    0
+        -attachForm            $c3Layout   "right"   0
+        -attachForm            $c3Layout   "bottom" 0
+        -attachPosition        $c3Layout  "left"  0 50
+    $scrollFormLayout;
+    
+    setParent $form;
+    string $acceptBtn = `button -l "确定" -c ("getArray(\"" + $c2Layout + "\")")`;
+    string $cancelBtn = `button -l "取消" -c "layoutDialog -dismiss \"dismiss\""`;
+    
+    int $edge = 5;
+
+    formLayout -edit
+        -attachForm            $titleLayout   "top"    $edge
+        -attachForm            $titleLayout   "left"   $edge
+        -attachNone            $titleLayout   "bottom"
+        -attachForm            $titleLayout   "right"  $edge
+
+        -attachControl         $scrollLayout  "top"    0 $titleLayout
+        -attachForm            $scrollLayout  "left"   $edge
+        -attachForm            $scrollLayout  "right"  $edge
+        -attachControl         $scrollLayout  "bottom" 0 $acceptBtn
+        
+        -attachNone            $acceptBtn   "top"
+        -attachForm            $acceptBtn   "left"   $edge
+        -attachControl            $acceptBtn   "right" 0 $cancelBtn
+        -attachForm            $acceptBtn   "bottom"  $edge
+        
+        -attachNone            $cancelBtn   "top"
+        -attachPosition         $cancelBtn   "left"   0 50
+        -attachForm            $cancelBtn   "right" $edge
+        -attachForm            $cancelBtn   "bottom"  $edge
+        
+    $form;
+    
+    global string $sameNameFileArray[];
+	global string $sameTargetFileShortNameArray[];
+	global string $sameTargetFileFullNameArray[];
+    addNameArray($sameNameFileArray,$sameTargetFileShortNameArray,$sameTargetFileFullNameArray,$c1Layout,$c2Layout,$c3Layout);
+    
+    setFocus $form;
+}
+
+proc int[] getSameNameIndexArray(string $name,string $nameArray[])
+{
+    int $indexArray[];
+    int $i = 0;
+    while($i != -1)
+    {
+        $i = stringArrayFind($name,$i,$nameArray);
+        if($i != -1)
+        {
+            $indexArray[size($indexArray)] = $i;
+            $i++;
+        }
+    }
+    return $indexArray;
+}
+
+global proc clearDataEa()
+{
+	global string $sameNameFileArray[];
+	global string $sameTargetFileShortNameArray[];
+	global string $changePicNameArray[];
+	global string $sameTargetFileFullNameArray[];
+	clear $sameNameFileArray;
+	clear $sameTargetFileShortNameArray;
+	clear $changePicNameArray;
+	clear $sameTargetFileFullNameArray;
+}
+
+//查找同名文件，非tx文件得到tx（若存在），tx得到非tx（若存在）
+//修改为任何格式
+proc string getSameNameFile(string $fileFullPath)
+{
+	$fileFullPath = `tolower $fileFullPath`;
+	$fileFullPath = toNativePath($fileFullPath);
+    string $extension = fileExtension($fileFullPath);
+    if($extension == "")
+    {
+        return "";
+    }
+    else
+    {
+        int $extensionLength = size($extension);
+        int $fullPathLength = size($fileFullPath);
+        if($extension == "jpg")
+        {
+            return (`substring $fileFullPath 1 ($fullPathLength - $extensionLength)` + "tx");
+        }else if($extension == "tx")
+        {
+            return (`substring $fileFullPath 1 ($fullPathLength - $extensionLength)` + "jpg");
+        }
+        else
+        {
+            return "";
+        }
+    }
+}
+
+global proc string[] NCZ_GetUdimSeq(string $file_node)
+{
+    //ncz@20211021
+	string $udim_seq[];clear $udim_seq;
+	if(`nodeType $file_node`=="file"){
+		string $file_texture_name = `getAttr ($file_node + ".fileTextureName")`;
+		$file_texture_name = `substituteAllString $file_texture_name "\\" "/"`;
+		$udim_seq[size($udim_seq)] = $file_texture_name;
+		if(`getAttr ($file_node + ".uvTilingMode")`==3){
+			string $buff[];clear $buff;
+			$buff = `stringToStringArray $file_texture_name "/"`;
+            string $texture_base_name = $buff[size($buff)-1];
+            string $texture_extension = `fileExtension $texture_base_name`;
+            string $texture_folder = `substituteAllString $file_texture_name ("/"+$texture_base_name) ""`;
+            //print("\n texture_base_name:" + $texture_base_name);
+            int $n = `size $texture_base_name`;
+            int $m = `size $texture_extension`;
+            string $texture_short_name = `substring $texture_base_name 1 ($n-$m-1)`;
+            //print("\n texture_short_name:" + $texture_short_name);
+            string $sep = "";
+            if(`gmatch $texture_short_name "*.[0-9][0-9][0-9][0-9]"`) $sep = ".";
+            if(`gmatch $texture_short_name "*_[0-9][0-9][0-9][0-9]"`) $sep = "_";
+            if(`gmatch $texture_short_name "*.[0-9][0-9][0-9][0-9].*"`) $sep = ".";
+            if(`gmatch $texture_short_name "*_[0-9][0-9][0-9][0-9]_*"`) $sep = "_";
+            if($sep!=""){
+                //print("\n   Sep:" + $sep);
+                string $temp[] = `stringToStringArray $texture_short_name $sep`;
+                // Roughness.<UDIM>.png
+                // Roughness_<UDIM>.png
+                if(`size $temp`>1){
+                    string $frame_num = $temp[size($temp)-1];
+                    for($each in $temp)
+                    {
+                        if(`gmatch $each "[0-9][0-9][0-9][0-9]"`) 
+                        {
+                            $frame_num = $each;
+                            break;
+                        }
+                    }
+                    //print("\n   frame_num:" + $frame_num);
+                    int $kn = `size $texture_short_name`;
+                    int $km = `size $frame_num`;
+                    string $texture_short_xframe = `substring $texture_short_name 1 ($kn-$km-1)`;
+                    //print("\n   texture_short_xframe:" + $texture_short_xframe);
+                    int $kf = (int)$frame_num;
+                    // get all file in folder
+                    string $fileList[] = `getFileList -fld $texture_folder`;
+                    string $filter = `substituteAllString $texture_base_name $frame_num "[0-9][0-9][0-9][0-9]"`;
+                    for($each in $fileList)
+                    {
+                        if(`gmatch $each $filter`) {
+                            $udim_seq[size($udim_seq)] = $texture_folder + "/" + $each;
+                        }
+                    }
+                   
+                    
+                    /*
+                    for($ki=$kf+1;$ki<$kf+999;$ki++){
+                        string $new_base = $texture_short_xframe + $sep + (string)$ki + "." + $texture_extension;
+                        $new_udim_file = `substituteAllString $file_texture_name $texture_base_name $new_base`;
+                        $new_udim_file = `substituteAllString $new_udim_file "\\" "/"`;
+                        //print("\n       new_udim_file:" + $new_udim_file);
+                        if(`filetest -f $new_udim_file`){
+                            $udim_seq[size($udim_seq)] = $new_udim_file;
+                        }
+                    }*/
+                }
+            }
+		}
+	}
+	return `stringArrayRemoveDuplicates $udim_seq`;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//
+// The Copy, Move and Set functions.
+//
+global proc FTM_Function (string $FTM_Function, string $FTM_OptionColumn)
+{    
+    string $FTM_SelectedFiles[] = getAllPicNodeArray(1);
+
+	if (`FTM_SelCheck $FTM_SelectedFiles`)
+	{
+		//waitCursor -state on;
+		FTM_Log "start" "" "";
+		int $wrong = 0;
+
+		//is copy same name file
+		int $isCopySameNameFile = `checkBoxGrp -q -v1 "FTM_Copy_Same_Name_File_Checker"`;
+		
+		// First get elements ready.
+		int $FTM_OperationMode = `radioButtonGrp -q -select ($FTM_OptionColumn + "|FTM_OperationMode")`;
+
+		// Source directory.
+		string $FTM_SourceDirectory;
+
+		// Target directory.
+		string $FTM_TargetDirectory = `textFieldButtonGrp -q -text ($FTM_OptionColumn + "|FTM_TargetDirectoryField")`;
+		$FTM_TargetDirectory = `FTM_GetPath "path" $FTM_TargetDirectory`;
+		// Check if new folder needed. If needed, create one only when the folder does not exist.
+		if ( `checkBoxGrp -q -v1 ($FTM_OptionColumn + "|FTM_MakeFolderChecker")` )
+		{
+			string $FTM_NewFolderName = `textFieldGrp -q -text ($FTM_OptionColumn + "|FTM_NewFolderNameField")`;
+			$FTM_TargetDirectory = $FTM_TargetDirectory + $FTM_NewFolderName;
+			if (!`file -q -ex $FTM_TargetDirectory`) {
+				if (`sysFile -md (fromNativePath($FTM_TargetDirectory))`)
+					FTM_Log "" ("Folder created: \"" + toNativePath($FTM_TargetDirectory) + "\".") "";
+				else {
+					$wrong = 1;
+					FTM_Log "" ("Folder can not be created: " + toNativePath($FTM_TargetDirectory) + "\".") "";
+				}
+			}
+			else {
+				if (!`filetest -w $FTM_TargetDirectory`) {
+					$wrong = 1;
+					FTM_Log "" ("Folder exists but is not writeable: " + toNativePath($FTM_TargetDirectory) + "\".") "";
+				}
+			}
+			$FTM_TargetDirectory = `FTM_GetPath "path" $FTM_TargetDirectory`;
+		}
+
+		if (!$wrong) {
+			// Define command for function.
+			string $FTM_FunctionCmd;
+			if ($FTM_Function == "Copy")
+				$FTM_FunctionCmd = "sysFile -cp ";
+			else if ($FTM_Function == "Move")
+				$FTM_FunctionCmd = "sysFile -mov ";
+
+			// base of progress feedback setup
+			int $progress = 0;
+			int $percentage = 0;
+			progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max `size $FTM_SelectedFiles`;
+
+			int $selectedFilesCount = size($FTM_SelectedFiles);
+			string $sourceFileFullPathArray[] = {};
+			string $sourceFileShortNameArray[] = {};
+			string $targetFileShortNameArray[] = {};
+
+			//唯一列表
+			string $sourceFileUniqueArray[] = {};
+			string $sourceFileUniqueFullPathArray[] = {};
+			string $sourceFileUniqueShortNameArray[] = {};
+			string $targetFileUniqueShortNameArray[] = {};
+			int $sourceFileUniqueStateArray[] = {};
+			int $sourceFileUniqueIndexArray[] = {};
+			
+
+			int $index;
+			for ($index = 0;$index < $selectedFilesCount;$index++){
+				// start to work
+				string $attr = getFirstRefFileAttr(`nodeType $FTM_SelectedFiles[$index]`);
+				string $FTM_CurrentFile = `getAttr ($FTM_SelectedFiles[$index] + "." + $attr)`;
+
+				string $FTM_SourceFile[] = `FTM_GetFile $FTM_CurrentFile`;
+				string $FTM_OriginSourceFile = $FTM_SourceFile[1];
+
+				// The file texture is not specified.
+				if (size($FTM_OriginSourceFile) == 0)
+				{
+					//FTM_Log "" "" "WARNING: File texture is not specified.";
+				}
+				// The file texture is specified.
+				else
+				{
+					// If replace string was selected, replace the string specified.
+					if ( `checkBoxGrp -q -v1 ($FTM_OptionColumn + "|FTM_ReplaceStringChecker")` )
+					{
+						string $FTM_OldString = `textFieldGrp -q -tx ($FTM_OptionColumn + "|FTM_OldStringField")`;
+						string $badChar[] = {"+",".","^","$","[","]","(",")"};
+							for ($char in $badChar)
+								$FTM_OldString = `substituteAllString $FTM_OldString $char ("\\"+$char)`;
+						string $FTM_MatchExpression = "(" + $FTM_OldString + ")+";
+						string $FTM_NewString = `textFieldGrp -q -tx ($FTM_OptionColumn + "|FTM_NewStringField")`;
+						//for ($i=0; $i<size($FTM_SourceFile[1]); $i++)
+							$FTM_SourceFile[1] = `substitute $FTM_MatchExpression $FTM_SourceFile[1] $FTM_NewString`;
+					}
+
+					// Add prefix or(and) append suffix.
+					string $FTM_Prefix;
+					string $FTM_Suffix;
+					string $FTM_SourceFileRegularName[] = `FTM_FCFileRegularName $FTM_SourceFile[1]`;
+					// If prefix was set, add it to the file name.
+					if ( `checkBox -q -v ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_AddPrefixChecker")` )
+						$FTM_Prefix = `textField -q -tx ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_PrefixField")`;
+					// If suffix was set, append it to the file name.
+					if ( `checkBox -q -v ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_AddSuffixChecker")` )
+						$FTM_Suffix = `textField -q -tx ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_SuffixField")`;
+
+					// Assemble the filename
+					if (size($FTM_SourceFileRegularName[1]))
+						$FTM_SourceFileRegularName[1] = "." + $FTM_SourceFileRegularName[1];
+					if (size($FTM_SourceFileRegularName[2]))
+						$FTM_SourceFileRegularName[2] = "." + $FTM_SourceFileRegularName[2];
+					$FTM_SourceFile[1] = $FTM_Prefix + $FTM_SourceFileRegularName[0] + $FTM_Suffix + $FTM_SourceFileRegularName[1] + $FTM_SourceFileRegularName[2];
+
+					$sourceFileFullPathArray[$index] = $FTM_SourceFile[0];
+					$sourceFileShortNameArray[$index] = $FTM_OriginSourceFile;
+					$targetFileShortNameArray[$index] = $FTM_SourceFile[1];	
+						
+					if (stringArrayCount($FTM_SourceFile[0],$sourceFileUniqueFullPathArray) == 0)
+					{
+						$sourceFileUniqueArray[size($sourceFileUniqueArray)] = $FTM_SelectedFiles[$index];
+						$sourceFileUniqueFullPathArray[size($sourceFileUniqueFullPathArray)] = $FTM_SourceFile[0];
+						$sourceFileUniqueShortNameArray[size($sourceFileUniqueShortNameArray)] = $FTM_OriginSourceFile;
+						$targetFileUniqueShortNameArray[size($targetFileUniqueShortNameArray)] = $FTM_SourceFile[1];
+						$sourceFileUniqueStateArray[size($sourceFileUniqueStateArray)] = 0;
+						$sourceFileUniqueIndexArray[size($sourceFileUniqueIndexArray)] = $index;
+					}
+				}
+			}
+			
+            
+            string $extra_buff[];clear $extra_buff;
+            int $idx;
+			for ($idx = 0;$idx < $selectedFilesCount;$idx++){
+                if(`nodeType $FTM_SelectedFiles[$idx]`=="file"){
+                    if(`getAttr ($FTM_SelectedFiles[$idx] + ".uvTilingMode")`==3){
+                        string $temp[] = `NCZ_GetUdimSeq $FTM_SelectedFiles[$idx]`;
+                        if(`size $temp`) $extra_buff = `stringArrayCatenate $extra_buff $temp`;
+                    }
+                }
+            }
+            if(`size $extra_buff`){
+                for($this in $extra_buff){
+                    if(`filetest -f $this`){
+                        string $SourceFile[] = `FTM_GetFile $this`;
+                        string $FTM_OriginSourceFile = $SourceFile[1];
+                        // If replace string was selected, replace the string specified.
+                        if ( `checkBoxGrp -q -v1 ($FTM_OptionColumn + "|FTM_ReplaceStringChecker")` )
+                        {
+                            string $FTM_OldString = `textFieldGrp -q -tx ($FTM_OptionColumn + "|FTM_OldStringField")`;
+                            string $badChar[] = {"+",".","^","$","[","]","(",")"};
+                                for ($char in $badChar)
+                                    $FTM_OldString = `substituteAllString $FTM_OldString $char ("\\"+$char)`;
+                            string $FTM_MatchExpression = "(" + $FTM_OldString + ")+";
+                            string $FTM_NewString = `textFieldGrp -q -tx ($FTM_OptionColumn + "|FTM_NewStringField")`;
+                            //for ($i=0; $i<size($SourceFile[1]); $i++)
+                                $SourceFile[1] = `substitute $FTM_MatchExpression $SourceFile[1] $FTM_NewString`;
+                        }
+                        // Add prefix or(and) append suffix.
+                        string $FTM_Prefix;
+                        string $FTM_Suffix;
+                        string $FTM_SourceFileRegularName[] = `FTM_FCFileRegularName $SourceFile[1]`;
+                        // If prefix was set, add it to the file name.
+                        if ( `checkBox -q -v ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_AddPrefixChecker")` )
+                            $FTM_Prefix = `textField -q -tx ($FTM_OptionColumn + "|FTM_AddPrefixRow|FTM_PrefixField")`;
+                        // If suffix was set, append it to the file name.
+                        if ( `checkBox -q -v ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_AddSuffixChecker")` )
+                            $FTM_Suffix = `textField -q -tx ($FTM_OptionColumn + "|FTM_AddSuffixRow|FTM_SuffixField")`;
+                        // Assemble the filename
+                        if (size($FTM_SourceFileRegularName[1]))
+                            $FTM_SourceFileRegularName[1] = "." + $FTM_SourceFileRegularName[1];
+                        if (size($FTM_SourceFileRegularName[2]))
+                            $FTM_SourceFileRegularName[2] = "." + $FTM_SourceFileRegularName[2];
+                        $SourceFile[1] = $FTM_Prefix + $FTM_SourceFileRegularName[0] + $FTM_Suffix + $FTM_SourceFileRegularName[1] + $FTM_SourceFileRegularName[2];
+                        string $cmd = $FTM_FunctionCmd + "\"" + `fromNativePath ($FTM_TargetDirectory + $SourceFile[1])` + "\" \"" + `fromNativePath $SourceFile[0]` + "\"";
+                        
+                        // Do the function.
+                        if ($FTM_Function != "Set") {
+                            if (!eval($cmd)) {
+                                $wrong = 1;
+                                FTM_Log "" "" ("WARNING: " + $FTM_Function + " can NOT be done, could be permission issue or path existence issue.");
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            
+            int $syncPath = `checkBoxGrp -v1 1 -q FTM_SYNC_Path_Checker`;
+			int $successAndNeedToSYNCPath = 0;
+			// Execute command of current function for every file texture node selected.
+			int $sourceFileUniqueFullPathArrayCount = size($sourceFileUniqueFullPathArray);
+			for ($index = 0;$index < $sourceFileUniqueFullPathArrayCount;$index++)
+			{
+				FTM_Log "" ($sourceFileUniqueArray[$index]+":") "";
+				if ( `progressWindow -q -ic` ){
+					FTM_Log "" "User cancelled." "";
+					break;
+				}
+				$wrong = 0;
+				// Check if the dialog has been cancelled
+								$progress += 1;
+				$percentage = $progress * (100/$sourceFileUniqueFullPathArrayCount);
+				//progressWindow -e -pr $progress -st ("Handling " + $FTM_SelectedFiles[$index] + "     ......  " + $percentage + "%");
+
+				// start to work
+				string $FTM_SourceFile[] = {$sourceFileUniqueFullPathArray[$index],$targetFileUniqueShortNameArray[$index]};
+				string $FTM_OriginSourceFile = $sourceFileUniqueShortNameArray[$index];
+
+				// The file texture is not specified.
+				if (size($FTM_OriginSourceFile) == 0)
+					FTM_Log "" "" "WARNING: File texture is not specified.";
+				// The file texture is specified.
+				else
+				{
+					// Function process.
+					string $FTM_FinalCmd;
+					string $FTM_FunctionResult;
+					int $setWrong = 0;
+					if ($FTM_Function != "Set")
+					{
+						int $targetShortNameCount = stringArrayCount($FTM_SourceFile[1],$targetFileUniqueShortNameArray);
+						if ($targetShortNameCount > 1){
+							int $sourceFileState = $sourceFileUniqueStateArray[$index];
+							if (!$sourceFileState){
+								int $sameNameIndexArray[] = getSameNameIndexArray($FTM_SourceFile[1],$targetFileUniqueShortNameArray);
+								global string $sameNameFileArray[];
+								clear $sameNameFileArray;
+								global string $sameTargetFileShortNameArray[];
+								clear $sameTargetFileShortNameArray;
+								global string $sameTargetFileFullNameArray[];
+								clear $sameTargetFileFullNameArray;
+								global string $changePicNameArray[];
+								int $sameNameIndexArrayCount = size($sameNameIndexArray);
+								int $i;
+								for ($i = 0;$i < $sameNameIndexArrayCount;$i++) {
+									$sameNameFileArray[size($sameNameFileArray)] = $sourceFileUniqueArray[$sameNameIndexArray[$i]];
+									$sameTargetFileShortNameArray[size($sameTargetFileShortNameArray)] = $FTM_SourceFile[1];
+									$sameTargetFileFullNameArray[size($sameTargetFileFullNameArray)] = $sourceFileUniqueFullPathArray[$sameNameIndexArray[$i]];
+								}
+								//if (`waitCursor -q -state`){
+								//	waitCursor -state off;
+								//}
+								progressWindow -ep;
+								string $result = `layoutDialog -ui "checkboxPrompt" -title "WARNING"`;
+								progressWindow -t "FTM Working..." -pr $progress -ii 1 -min 0 -max $sourceFileUniqueFullPathArrayCount;
+								progressWindow -e -pr $progress -st ("Handling " + $sourceFileUniqueArray[$index] + "     ......  " + $percentage + "%");
+
+								for ($i = 0;$i < $sameNameIndexArrayCount;$i++) 
+								{
+									int $sameNameIndex = $sameNameIndexArray[$i];
+									$sourceFileUniqueStateArray[$sameNameIndex] = 1;
+									if ($result == "done")
+									{
+										if ($changePicNameArray[$i] != "")
+										{	
+											$targetFileUniqueShortNameArray[$sameNameIndex] = $changePicNameArray[$i];
+										}
+									}
+								}
+							}
+						}
+						if ($FTM_OperationMode == 1)
+						{
+							$FTM_FinalCmd = $FTM_FunctionCmd + "\"" + `fromNativePath ($FTM_TargetDirectory + $FTM_SourceFile[1])` + "\" \"" + `fromNativePath $FTM_SourceFile[0]` + "\"";
+							$FTM_FunctionResult = $FTM_Function + " \"" + $FTM_SourceFile[0] + "\" to \"" + $FTM_TargetDirectory + $FTM_SourceFile[1] + "\". ";
+							if ($isCopySameNameFile){
+								//如果是jpg或者tx，寻找是否有同名tx或者jpg，加进命令去
+								string $sameNameFile = getSameNameFile($FTM_SourceFile[0]);
+								if ($sameNameFile != ""){
+									int $hasSameNameFile = `filetest -e $sameNameFile`;
+									print($hasSameNameFile + "\n");
+									if ($hasSameNameFile){
+										//$FTM_SourceFile[1]还需要换掉！！！
+										string $FTM_SameNameFile_FinalCmd = $FTM_FunctionCmd + "\"" + `fromNativePath ($FTM_TargetDirectory + $FTM_SourceFile[1])` + "\" \"" + `fromNativePath $sameNameFile` + "\"";
+										$FTM_FinalCmd = $FTM_FinalCmd + ";" + $FTM_SameNameFile_FinalCmd;
+									}
+								}
+							}
+						}
+						else if ($FTM_OperationMode == 2)
+						{
+							$FTM_SourceDirectory = `textFieldButtonGrp -q -text ($FTM_OptionColumn + "|FTM_SourceDirectoryField")`;
+							$FTM_SourceDirectory = `FTM_GetPath "path" $FTM_SourceDirectory`;
+							$FTM_FinalCmd = $FTM_FunctionCmd + "\"" + `fromNativePath ($FTM_TargetDirectory + $FTM_SourceFile[1])` + "\" \"" + `fromNativePath ($FTM_SourceDirectory + $FTM_OriginSourceFile)` + "\"";
+							$FTM_FunctionResult = $FTM_Function + " \"" + $FTM_SourceDirectory + $FTM_OriginSourceFile + "\" to \"" + $FTM_TargetDirectory + $FTM_SourceFile[1] + "\". ";
+							if ($isCopySameNameFile){
+								print("check to copy same name file");
+							}
+						}
+					}
+
+					// Do the function.
+					if ($FTM_Function != "Set") {
+						if (!eval($FTM_FinalCmd)) {
+							$wrong = 1;
+							FTM_Log "" "" ("WARNING: " + $FTM_Function + " can NOT be done, could be permission issue or path existence issue.");
+						}
+						else
+						{
+							if ($syncPath){
+								$successAndNeedToSYNCPath = 1;
+							}
+						}
+					}
+
+					if (($FTM_Function == "Set") || $successAndNeedToSYNCPath)
+					{
+						string $path = `fromNativePath ($FTM_TargetDirectory + $FTM_SourceFile[1])`;
+						int $i;
+						for ($i = 0;$i < $selectedFilesCount;$i++)
+						{
+							if ($FTM_SourceFile[0] == $sourceFileFullPathArray[$i])
+							{
+								string $sameFile = $FTM_SelectedFiles[$i];
+								string $attr = getFirstRefFileAttr(`nodeType $sameFile`);
+                                string $color_space_org = `getAttr ($sameFile + ".colorSpace")`;
+								string $cmd = "setAttr -typ \"string\" " + $sameFile + "." + $attr + " \"" + $path + "\"";
+                                //print("\nFile Texture Manager Set Path cmd:" + $cmd);
+	    						if (catchQuiet(eval($cmd))) 
+	    						{
+	    							$FTM_FunctionResult += "Attribute \"" + $attr + "\" is locked/connected and can NOT be modified!";
+	    							$setWrong = 1;
+	    						}else{
+                                    $FTM_FunctionResult += "Set to \"" + $FTM_TargetDirectory + $FTM_SourceFile[1] + "\". ";
+                                }
+                                catch(`setAttr -type "string" ($sameFile + ".colorSpace") $color_space_org`);
+							}
+						}
+						
+						
+					}
+
+					if (!$wrong) {
+						// Print the function result.
+						if ( `file -q -ex ($FTM_TargetDirectory + $FTM_SourceFile[1])` )
+						{
+							if ($FTM_Function == "Move")
+							{
+								// File copied but not removed -- not actually "move".
+								if ( `file -q -ex $FTM_SourceFile[0]` || `file -q -ex ($FTM_SourceDirectory + $FTM_OriginSourceFile)`)
+								{
+									$FTM_FunctionResult = "Succeed: " + $FTM_FunctionResult + " But the original file is not removed. Check the HELP for possible reasons.";
+									FTM_Log "" "" ("WARNING: " + $FTM_FunctionResult);
+								}
+								else
+								{
+									$FTM_FunctionResult = "Succeed: " + $FTM_FunctionResult;
+									FTM_Log "" "" $FTM_FunctionResult;
+								}
+							}
+							else
+							{
+								$FTM_FunctionResult = "Succeed: " + $FTM_FunctionResult;
+								FTM_Log "" "" $FTM_FunctionResult;
+							}
+						}
+						else
+						{
+							if ($FTM_Function == "Set") {
+								if ($setWrong)
+									$FTM_FunctionResult = "WARNING: " + $FTM_FunctionResult;
+								else
+									$FTM_FunctionResult = "Succeed: " + $FTM_FunctionResult + "But destination does NOT exist.";
+							}
+							else if ($FTM_Function != "Set")
+								$FTM_FunctionResult = "Fail: " + $FTM_FunctionResult + "Check Help tab for possible reasons.";
+							FTM_Log "" "" $FTM_FunctionResult;
+						}
+					}
+				}
+				progressWindow -e -pr $progress -st ("Handling " + $sourceFileUniqueArray[$index] + "     ......  " + $percentage + "%");
+			}
+		}
+
+		// finish progress feed back
+		progressWindow -ep;
+		// job done
+		FTM_Log "end" "" "";
+		FTM_END;
+		//if (`waitCursor -q -state`){
+		//	waitCursor -state off;
+		//}	
+		clearDataEa();
+	}
+}
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
+//Build the main UI.
+//
+global proc FileTextureManager ()
+{
+select -cl;
+
+global string $FTM_MayaWorkSpace;
+$FTM_MayaWorkSpace = `workspace -q -dir`;
+global string $FTM_WorkSpace = "";
+
+//Make sure the window will be displayed in proper size.
+windowPref -enableAll false;
+//If the UI exits , delete it.
+if (`window -exists FTM_MainWindow`)
+	deleteUI FTM_MainWindow;
+//Build a new UI.
+window -title "File Texture Manager (20230414)" -wh 380 600 -tlc 200 200 -ret FTM_MainWindow;
+	string $FTM_MainForm = `formLayout`;
+		string $FTM_Tabs = `tabLayout -imw 0 -imh 0`;
+//Option tab
+		string $FTM_OptionForm = `formLayout`;
+			paneLayout -configuration "horizontal3" -paneSize 1 100 10 -paneSize 2 100 40 
+			-paneSize 3 100 50 FTM_PANELAYOUT;
+//Analyse area
+				// formLayout -nd 100 FTM_AnalyseForm;
+						string $FTM_AnalyseColumn = `columnLayout -cat both 30 -adj 1 -rs 5`;
+							button -l "Analyse Scene File Textures" -h 30 -w 250 FTM_AnalyseButton;
+							text -l "" -h 5;
+							text -l "Select files you want to manage. <Multi-Selectable>";
+						string $FTM_AnalysisScroll = `scrollLayout -p FTM_PANELAYOUT`;
+							string $FTM_AnalysisColumn = `columnLayout -cat left 15`;
+								text -l "Not analysed yet." FTM_EmptyAnalysisText;
+							button -e -c ("FTM_AnalyseFileTextures " + $FTM_AnalysisColumn) ($FTM_AnalyseColumn + "|FTM_AnalyseButton");
+				// formLayout -e
+				// 	-af $FTM_AnalyseColumn left 0
+				// 	-af $FTM_AnalyseColumn right 0
+				// 	-af $FTM_AnalyseColumn top 5
+				// 	-af $FTM_AnalyseColumn bottom 200
+				// 	-ac $FTM_AnalysisScroll top 5 $FTM_AnalyseColumn
+				// 	-af $FTM_AnalysisScroll bottom 0
+				// 	-af $FTM_AnalysisScroll left 0
+				// 	-af $FTM_AnalysisScroll right 0
+				// 	($FTM_OptionColumn2 + "|FTM_AnalyseForm");
+			setParent FTM_PANELAYOUT;
+			scrollLayout -childResizable 1;
+			// string $FTM_SubForm = `formLayout`;
+			string $FTM_OptionColumn = `columnLayout -adj 1 -rs 5`;
+				separator -style "in" -h 10;
+//Operation mode
+				radioButtonGrp -l "Operation Mode" -la2 "Automatic" "Manual" -nrb 2 -select 1 -cl3 right left left -cw3 120 100 100 FTM_OperationMode;
+
+				separator -style "in" -h 5;
+
+//Set source directory area
+				textFieldButtonGrp -label "Source Directory" -text "" -buttonLabel "Browse..." -adj 2 -en 0 -cw 1 120 -cw 3 60 -cl3 right left center FTM_SourceDirectoryField;
+
+				separator -style "in" -h 5;
+
+//Set target directory area
+				string $FTM_CurrentProject = `workspace -q -rd`;
+				string $FTM_CurrentSourceImagesDir = $FTM_CurrentProject + `workspace -q -fre "sourceImages"`;
+				string $FTM_SourceImages = `FTM_GetPath "path" $FTM_CurrentSourceImagesDir`;
+				textFieldButtonGrp -label "Target Directory" -text $FTM_SourceImages -buttonLabel "Browse..." -adj 2 -cw 1 120 -cw 3 60 -cl3 right left center FTM_TargetDirectoryField;
+				checkBoxGrp -ncb 1 -l1 "SetPath to Target Directory after Copy Files or Move Files" -adj 1 -v1 1 -cat 1 left 101 FTM_SYNC_Path_Checker;
+				checkBoxGrp -en1 0 -ncb 1 -l1 "copy the same name tx from jpg/copy the same name jpg from tx" -adj 1 -v1 0 -cat 1 left 101 FTM_Copy_Same_Name_File_Checker;
+//Create new folder area
+				checkBoxGrp -ncb 1 -l1 "Make New Folder Under Target Directory" -adj 1 -v1 0 -cat 1 left 101 FTM_MakeFolderChecker;
+				textFieldGrp -label "Folder Name" -text "MyTextureFiles" -en 0 -cw2 120 180 -cl2 right left FTM_NewFolderNameField;
+				text -al center -l "The FINAL target directory will be equal to target directory";
+				text -al center -l "plus the new folder if user decide to make a new folder";
+				separator -style "in" -h 5;
+//Update texture file area
+				rowLayout -nc 2 -cw 1 120 -cat 1 right 0 -cl2 left left FTM_AddPrefixRow;
+					checkBox -l "Add Prefix" -v 0 FTM_AddPrefixChecker;
+					textField -tx "prefix_" -en 0 -w 150 FTM_PrefixField;
+			setParent $FTM_OptionColumn;
+				rowLayout -nc 2 -cw 1 120 -cat 1 right 0 -cl2 left left FTM_AddSuffixRow;
+					checkBox -l "Add Suffix" -v 0 FTM_AddSuffixChecker;
+					textField -tx "_suffix" -en 0 -w 150 FTM_SuffixField;
+			setParent $FTM_OptionColumn;
+				checkBoxGrp -ncb 1 -l1 "Replace String" -adj 1 -v1 0 -cat 1 left 101 FTM_ReplaceStringChecker;
+				textFieldGrp -l "Old String" -tx "OldString" -en 0 -cw2 120 150 -cl2 right left FTM_OldStringField;
+				textFieldGrp -l "New String" -tx "NewString" -en 0 -cw2 120 150 -cl2 right left FTM_NewStringField;
+		formLayout -e
+			-af FTM_PANELAYOUT top 5
+			-af FTM_PANELAYOUT left 0
+			-af FTM_PANELAYOUT right 0
+			-af FTM_PANELAYOUT bottom 0
+			$FTM_OptionForm;
+		// formLayout -e
+		// 	-af $FTM_OptionColumn left 0
+		// 	-af $FTM_OptionColumn right 0
+		// 	-af $FTM_OptionColumn top 0
+		// 	-af $FTM_OptionColumn bottom 0
+		// 	$FTM_SubForm;
+		setParent $FTM_Tabs;
+//Extra function tab
+			string $FTM_ExtraFunctionScroll = `scrollLayout -cr true`;
+			string $FTM_ExtraFunctionColumn = `columnLayout -cat both 15 -adj 1 -rs 5`;
+				// Substitute path root area
+				separator -style "none" -h 5;
+				text -fn "boldLabelFont" -al left -l "Substitute path root";
+				textFieldButtonGrp -l "Old Root" -text "" -buttonLabel "Browse..." -adj 2 -en 1 -cw 1 80 -cw 3 60 -cl3 right left center oldRootField;
+				textFieldButtonGrp -e -bc ("FTM_BrowseCmd \"path\" " + $FTM_ExtraFunctionColumn + "|oldRootField \"Choose old root\" 4") ($FTM_ExtraFunctionColumn + "|oldRootField");
+				string $tmp = `workspace -q -rd` + `workspace -q -fre "sourceImages"`;
+				$tmp = `FTM_GetPath "path" $tmp`;
+				textFieldButtonGrp -l "New Root" -text $tmp -buttonLabel "Browse..." -adj 2 -en 1 -cw 1 80 -cw 3 60 -cl3 right left center newRootField;
+				textFieldButtonGrp -e -bc ("FTM_BrowseCmd \"path\" " + $FTM_ExtraFunctionColumn + "|newRootField \"Choose new root\" 4") ($FTM_ExtraFunctionColumn + "|newRootField");
+				button -h 25 -l "Substitute" -c ("FTM_Substitute " + $FTM_ExtraFunctionColumn + "|oldRootField " + $FTM_ExtraFunctionColumn + "|newRootField");
+				// BOT setup area
+				separator -style "in" -h 10;
+				text -fn "boldLabelFont" -al left -l "BOT Setup (Maya render only)";
+				rowLayout -nc 3 -adj 3
+						-cw 1 170 -cw 2 2 -cal 3 center
+						-cat 1 both 0 -cat 3 both 0
+						-rat 1 bottom 0 -rat 2 bottom 0 -rat 3 bottom 0
+						FTM_BOTRow;
+					intFieldGrp -nf 1 -adj 2 -cw 1 50 -cat 1 left 0 -cat 2 both 5 -l "Threshold" -el "" -v1 1024 FTM_BOTResFieldGrp;
+					text -l "";
+					button -h 25 -l "Setup BOT" -c ("FTM_BOTSetup 1 " + $FTM_ExtraFunctionColumn);
+				setParent ..;
+				button -h 25 -l "Cancel BOT" -c ("FTM_BOTSetup 0 " + $FTM_ExtraFunctionColumn);
+				// Filter setup area
+				separator -style "in" -h 10;
+				text -fn "boldLabelFont" -al left -l "Filter setup";
+				rowLayout -nc 2 -cw 1 120 -cat 2 left 30 -adj 2 -cal 2 center -rat 1 bottom 0 FTM_FilterTypeRow;
+					optionMenu -l "Filter Type" FTM_FilterTypeMenu;
+							menuItem -label "Off";
+							menuItem -label "Mipmap";
+							menuItem -label "Box";
+							menuItem -label "Quadratic";
+							menuItem -label "Quartic";
+							menuItem -label "Gaussian";
+					optionMenu -e -v "Mipmap" ($FTM_ExtraFunctionColumn + "|FTM_FilterTypeRow|FTM_FilterTypeMenu");
+					button -h 25 -l "Set Filter Type" -c ("FTM_FilterSetup " + $FTM_ExtraFunctionColumn);
+				setParent ..;
+				// Format conversion area
+				separator -style "in" -h 10;
+				text -fn "boldLabelFont" -al left -l "Texture file format conversion";
+				rowLayout -nc 3	-cw 1 80 -cw 3 80 -cat 1 left 0 -cat 2 left 10 -cat 3 left 10 -adj 2 -cal 2 center FTM_FCRow;
+					optionMenu -l "From" FTM_FCSourceMenu;
+						menuItem -label "\*";
+						global string $FTM_FCAllFormats[];
+						for ($i=0;$i<size($FTM_FCAllFormats);$i++)
+							menuItem -label $FTM_FCAllFormats[$i];
+					button -h 25 -l "Select Matches" -c ("select -r `FTM_FCGetMatches \"" + $FTM_ExtraFunctionColumn + "|FTM_FCRow|FTM_FCSourceMenu\"`;");
+					optionMenu -l "To" FTM_FCTargetMenu;
+						for ($i=0;$i<size($FTM_FCAllFormats);$i++)
+							menuItem -label $FTM_FCAllFormats[$i];
+				setParent ..;
+				checkBox -l "Handle sequence textures." -al "left" -v 0 FTM_SeqCheck;
+				checkBox -l "Update path info." -al "left" -v 1 FTM_UpdateCheck;
+				checkBox -l "Remove original textures. Use with caution!" -al "left" -v 0 -en 1 FTM_RemoveCheck;
+				checkBox -e -onc ("checkBox -e -en 1 " + $FTM_ExtraFunctionColumn + "|FTM_RemoveCheck")
+							-ofc ("checkBox -e -en 0 " + $FTM_ExtraFunctionColumn + "|FTM_RemoveCheck")
+							($FTM_ExtraFunctionColumn + "|FTM_UpdateCheck");
+				button -l "Convert" -h 25 -c ("FTM_FCGatherInfo " + $FTM_ExtraFunctionColumn);
+		setParent $FTM_Tabs;
+//Help tab
+			string $FTM_HelpForm = `formLayout`;
+//Description area
+				scrollField -ww true -editable false FTM_HelpField;
+//About FileTextureManager
+			setParent $FTM_HelpForm;
+				string $FTM_AboutFrame = `frameLayout -l "About FileTextureManager" -la top -fn boldLabelFont -cll 0 -bv true -bs "in" -li 5`;
+				string $FTM_AboutForm = `formLayout`;
+					string $FTM_AboutTextLeft = `text -l "Script Name :\nUpdated :\nAuthor :\nContact :\n\nAll  Rights  Reserved." -al left`;
+					string $FTM_AboutTextRight = `text -l "FileTextureManager.mel\nAug, 2005\nCrow Yeh\nCrow@citiz.net" -al left`;
+				formLayout -e
+					-af $FTM_AboutTextLeft left 10
+					-af $FTM_AboutTextLeft top 5
+					-an $FTM_AboutTextLeft right
+					-af $FTM_AboutTextLeft bottom 5
+					-ac $FTM_AboutTextRight left 10 $FTM_AboutTextLeft
+					-af $FTM_AboutTextRight top 5
+					-an $FTM_AboutTextRight right
+					-af $FTM_AboutTextRight bottom 5
+					$FTM_AboutForm;
+			formLayout -e
+				-ac FTM_HelpField bottom 5 $FTM_AboutFrame
+				-af FTM_HelpField top 5
+				-af FTM_HelpField left 0
+				-af FTM_HelpField right 0
+				-an $FTM_AboutFrame top
+				-af $FTM_AboutFrame left 0
+				-af $FTM_AboutFrame right 0
+				-af $FTM_AboutFrame bottom 0
+				$FTM_HelpForm;
+//Function form.
+	setParent $FTM_MainForm;
+		string $FTM_FunctionForm = `formLayout -h 30 -numberOfDivisions 100`;
+			string $FTM_CopyButton = `button -l "Copy Files"
+							-c ("FTM_Function \"Copy\" " + $FTM_OptionColumn)`;
+			string $FTM_MoveButton = `button -l "Move Files"
+							-c ("FTM_Function \"Move\" " + $FTM_OptionColumn)`;
+			string $FTM_SetButton = `button -l "Set Path"
+							-c ("FTM_Function \"Set\" " + $FTM_OptionColumn)`;
+			string $FTM_ResetButton = `button -l "Reset FTM" -c ("FTM_ResetUI "+$FTM_OptionColumn+" "+$FTM_AnalysisColumn+" "+$FTM_ExtraFunctionColumn+" "+$FTM_Tabs+" "+$FTM_CopyButton+" "+$FTM_MoveButton+" "+$FTM_SetButton)`;
+			string $FTM_CloseButton = `button -l "Exit"
+							-c ("deleteUI FTM_MainWindow; select -cl;global string $FTM_MayaWorkSpace; workspace -dir $FTM_MayaWorkSpace;")`;
+		formLayout -e
+			-ap $FTM_CopyButton right 1 20
+			-af $FTM_CopyButton top 0
+			-af $FTM_CopyButton left 0
+			-af $FTM_CopyButton bottom 0
+			-ap $FTM_MoveButton left 1 20
+			-ap $FTM_MoveButton right 1 40
+			-af $FTM_MoveButton top 0
+			-af $FTM_MoveButton bottom 0
+			-ap $FTM_SetButton left 1 40
+			-ap $FTM_SetButton right 1 60
+			-af $FTM_SetButton top 0
+			-af $FTM_SetButton bottom 0
+			-af $FTM_ResetButton top 0
+			-af $FTM_ResetButton bottom 0
+			-ap $FTM_ResetButton left 1 60
+			-ap $FTM_ResetButton right 1 80
+			-ap $FTM_CloseButton left 1 80
+			-af $FTM_CloseButton top 0
+			-af $FTM_CloseButton right 0
+			-af $FTM_CloseButton bottom 0
+			$FTM_FunctionForm;
+	formLayout -e
+		-af $FTM_Tabs top 0
+		-af $FTM_Tabs left 0
+		-af $FTM_Tabs right 0
+		-ac $FTM_Tabs bottom 3 $FTM_FunctionForm
+		-af $FTM_FunctionForm left 0
+		-af $FTM_FunctionForm right 0
+		-af $FTM_FunctionForm bottom 0
+		-an $FTM_FunctionForm top
+		$FTM_MainForm;
+
+FTM_EditUIControl $FTM_OptionColumn $FTM_HelpForm;
+
+
+string $tabCC = "button -e -en 0 " + $FTM_CopyButton + ";";
+$tabCC += "button -e -en 0 " + $FTM_MoveButton + ";";
+$tabCC += "button -e -en 0 " + $FTM_SetButton + ";";
+$tabCC += "if (`tabLayout -q -sti " + $FTM_Tabs + "` == 1) {;";
+$tabCC += "button -e -en 1 " + $FTM_CopyButton + ";";
+$tabCC += "button -e -en 1 " + $FTM_MoveButton + ";";
+$tabCC += "button -e -en 1 " + $FTM_SetButton + ";";
+$tabCC += "}";
+tabLayout -e -tl $FTM_OptionForm "BasicFunctions" -tl $FTM_ExtraFunctionScroll "ExtraFunctions" -tl $FTM_HelpForm "Help" -psc $tabCC $FTM_Tabs;
+showWindow FTM_MainWindow;
+//Make sure other windows will be displayed in proper size.
+windowPref -enableAll true;
+}
+
+FileTextureManager();
+//////////////
+// MEL Ends //
+//////////////

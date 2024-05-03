@@ -1,0 +1,648 @@
+//RETURNS BBOX VECTOR VALUE OF SELECTED COMPONENTS 
+
+global proc float[] pl_bboxComp(){
+    float $bb[] = `polyEvaluate -bc`;    
+    return {($bb[0]-$bb[1]), ($bb[2]-$bb[3]), ($bb[4]-$bb[5])};   
+}
+
+//CHECKS IF MESH HAS HOLES, OUTPUT VALUE IS BOOLEAN 
+
+global proc int pl_geoHole(){ 
+    string $selected[] = `ls -sl -l`;   
+    polySelectConstraint -mode 3 -type 0x8000 -where 1;
+    int $check = (size(`ls -sl`)>0) ? 1 : 0;
+    polySelectConstraint -disable;  
+    select -r $selected;   
+    return $check;    
+}   
+
+//GETS POSITION AND VECTOR OF SELECTED COMPONENT(S), RETURNS AN ARRAY OF 6 FLOATS (3 OF POSITION, AND 3 OF VECTOR)
+
+global proc float[] pl_vector(){  
+    SelectTool;
+    MoveTool;
+    vector $Y = unit(<<0,1,0>>);
+    vector $pos = `manipMoveContext -q -p Move`;
+    float $nms[] = `polyNormalPerVertex -q -xyz`;    
+    vector $Z={0,0,0};
+    for($i=0; $i<size($nms); $i+=3) $Z+=<<$nms[$i],$nms[$i+1],$nms[$i+2]>>;     
+    $Z = ($Z==<<0,0,0>>) ? <<0,0,1>> : unit($Z);
+    $Y = ($Y==abs($Z)) ? unit(<<1,0,0>>) : $Y;
+    vector $X = unit(cross($Z,$Y));
+    $Y = unit(cross($Z,$X));
+    return {($X.x), ($X.y), ($X.z), 0, ($Y.x), ($Y.y), ($Y.z), 0, ($Z.x), ($Z.y), ($Z.z), 0, ($pos.x), ($pos.y), ($pos.z), 1};
+}
+
+
+//SHATTERS A SELECTED OBJECT(S) BY THE LAST SELECTED ONE
+//select your mesh object(s) wich you want to shatter and then select the one by wich you want to shatter the first selected object(s) --> run pl_shatterCutBy
+//returns a string array of result objects
+
+global proc string[] pl_shatterCutBy(){ 
+    int $rand = int(rand(size(`ls -sl`)*1000));
+    string $first[] = stringArrayRemove(`ls -sl -l -tl 1`, `ls -sl -l -tr`);
+    string $firstTr[] = `ls -sn -tr $first`; 
+    $firstTr[0] = substituteAllString($firstTr[0], `match (".*[|]") $firstTr[0]`, ""); 
+    string $second[] = `ls -sl -l -tl 1`; 
+    int $firstCount = `size($first)`;
+    string $grp[] = {};
+    float $merge = `floatSliderGrp -query -v MERGE`;
+    int $legacy = `checkBoxGrp -query -v1 LEGACY`;
+    string $grpName = `textFieldGrp -query -tx GRP_CUT`;
+    
+    if(size(`ls -sl -l -tr`)<2) confirmDialog -t "Select" -ma "center" -message "Please select at least two objects!" -b "OK" -db "OK";   
+    else{ 
+        select -r $first;
+        
+        if(!`objExists Interior_pl_shatterCutBy`){
+            shadingNode -asShader lambert -ss -n Interior_pl_shatterCutBy;
+            setAttr "Interior_pl_shatterCutBy.color" 0.382 0.256526 0.092444 ;
+        }        
+        
+        string $firstGroup[] =`listRelatives -p -f -type transform`;        
+        
+        int $checkGrp = `gmatch $firstGroup[0] "*pl_shattered*"`;
+        
+        if($checkGrp<1){
+            HideSelectedObjects;
+            select -r $first;
+            duplicate;
+            ShowSelectedObjects;           
+        }
+        else $grp = `listRelatives -p -f -type transform $first`;   
+        Group;
+        Ungroup;  
+        $first = `ls -sl -l -tr`;   
+        delete -ch;       
+        string $crapExistsFirst[] = `listRelatives -f`;
+        
+        if(size($crapExistsFirst)>1){
+            for($i=0; $i<size($crapExistsFirst); $i++){ 
+                if(`nodeType $crapExistsFirst[$i]` != "mesh")
+                    delete $crapExistsFirst[$i];
+            }
+        }
+
+        for($s=0; $s<$firstCount; $s++){
+            select -r $first[$s];
+            polyCloseBorder -ch 0;
+            ConvertSelectionToVertices;
+            polyMergeVertex  -d $merge -am 1 -ch 0;
+            select -r $first[$s];       
+            polyNormalPerVertex -ufn true;
+            makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;            
+            delete -ch;
+        }
+
+        select -r $second[0];
+        int $geoHole = `pl_geoHole`;               
+        $second = `duplicate`;  
+        catchQuiet(`hyperShade -a Interior_pl_shatterCutBy`);   
+        delete -ch;    
+        string $crapExistsSecond[] = `listRelatives -f`; 
+
+        if(size($crapExistsSecond)>0){
+            for($i=1; $i<size($crapExistsSecond); $i++){ 
+                if(`nodeType $crapExistsSecond[$i]` != "mesh")
+                    delete $crapExistsSecond[$i];
+            }
+        }
+
+        string $base[] = {};
+        string $chunk[] = {};
+        string $name =  $firstTr[0]+$rand+"_pl_chunk1";  
+        if($checkGrp>0) $name = $firstTr[0];
+        string $temp[] = {};
+       
+        if($geoHole>0){
+            for($d=0; $d<$firstCount; $d++){
+                select -r $first[$d] $second[0];
+                $temp = `duplicate`;
+                if($legacy>0) polyBoolOp -op 3 -ch 0 -uth 1 -vdt $merge -n $name;
+                else polyCBoolOp -op 3 -cls 1 -ucb 1 -ch 0 -uth 1 -vdt $merge -n $name;                           
+                xform -cp;
+                appendStringArray($base, `listRelatives -f -c -type mesh`, 1);
+                catchQuiet(`delete $temp[1]`);
+                select -r $second[0];
+                $temp = `duplicate`;       
+                select -af $first[$d];                
+                if($legacy>0) polyBoolOp -op 2 -ch 0 -uth 1 -vdt $merge -n $name; 
+                else polyCBoolOp -op 2 -cls 1 -ucb 1 -ch 0 -uth 1 -vdt $merge -n $name;
+                xform -cp;
+                appendStringArray($chunk, `listRelatives -f -c -type mesh`, 1);
+                catchQuiet(`delete $temp`);
+                xform -cp;
+            } 
+        }
+        else{
+            for($d=0; $d<$firstCount; $d++){
+                select -r $first[$d] $second[0];
+                $temp = `duplicate`;                
+                if($legacy>0) polyBoolOp -op 2 -ch 0 -uth 1 -vdt $merge -n $name;   
+                else polyCBoolOp -op 2 -cls 1 -ucb 1 -ch 0 -uth 1 -vdt $merge -n $name;
+                xform -cp;
+                appendStringArray($base, `listRelatives -f -c -type mesh`, 1);
+                catchQuiet(`delete $temp[1]`);   
+                catchQuiet(`delete $temp[0]`);             
+                select -r $second[0];
+                $temp = `duplicate`;                       
+                select -add $first[$d];                 
+                if($legacy>0) polyBoolOp -op 3 -ch 0 -uth 1 -vdt $merge -n $name; 
+                else polyCBoolOp -op 3 -cls 1 -ucb 1 -ch 0 -uth 1 -vdt $merge -n $name;               
+                xform -cp;
+                appendStringArray($chunk, `listRelatives -f -c -type mesh`, 1);  
+                xform -cp;
+                catchQuiet(`delete $temp`);
+                catchQuiet(`delete $first[$d]`);                  
+            }               
+        }        
+
+        delete $second[0];
+
+        if(size($grp)>0){
+            catchQuiet(`parent $base $grp[0]`);
+            $base = `ls -sl -l -tr`;
+            catchQuiet(`parent $chunk $grp[0]`);
+            select $grp;
+            
+        }                      
+        
+        else{
+            if(!`objExists $grpName`)
+                createNode -ss transform -n $grpName;
+            if(!`objExists ($firstTr[0]+"_pl_shattered")`)
+                createNode -ss transform -n ($firstTr[0]+"_pl_shattered") -p $grpName;
+                        
+            catchQuiet(`parent $base ("|"+$grpName+"|"+$firstTr[0]+"_pl_shattered")`);
+            $base = `ls -sl -l -tr`;
+            catchQuiet(`parent $chunk ("|"+$grpName+"|"+$firstTr[0]+"_pl_shattered")`);         
+        }
+
+        if($firstCount>1) $base = {""};     
+            
+        return $base;
+    } 
+}
+
+//CREATES PLANE(S)
+
+global proc string pl_chipOffplane(float $minScale, float $maxScale, int $minDiv, int $maxDiv, int $singleMode, int $flat, string $name){    
+    if(!`objExists Chips_pl_chipOff`){
+        shadingNode -asShader lambert -ss -n Chips_pl_chipOff;
+        setAttr "Chips_pl_chipOff.transparency" -type double3 0.8 0.8 0.8;
+    }  
+    
+    float $X, $YZ;
+    
+    if($singleMode>0){
+        float $bb[] = `pl_bboxComp`; 
+        if($bb[0]<1 && $bb[0]>-1) $bb[0] = -1;
+        if($bb[1]<1 && $bb[1]>-1) $bb[1] = 1;
+        if($bb[2]<1 && $bb[2]>-1) $bb[2] = 1; 
+        $YZ = ($bb[0]+$bb[1]+$bb[2])*1.2;          
+        $X = -$YZ;
+    }
+    else{        
+        $YZ = rand($minScale, $maxScale);            
+        $X = $YZ;   
+    }
+    
+    float $div = rand($minDiv, $maxDiv);
+    string $plane[] = `polyPlane -w 1 -h 1 -sx 50 -sy 50 -ax 0 0 1 -ch 1 -n ($name+"_pl_plane1")`;  
+    string $geo[] = `listRelatives -f`;
+    catchQuiet(`hyperShade -a Chips_pl_chipOff`); 
+    scale -a -xyz 100 100 100 $plane[0];
+    if($flat>0) polyMoveFacet -ch 1 -random 10 -ltz (1.5/$div);
+    else polyMoveFacet -ch 1 -random 10 -ltz (5/$div);
+    scale -a -xyz 1 1 1 $plane[0];
+    ConvertSelectionToUVs;
+    polyEditUV -u 0 -v 2;	
+    changeSelectMode -component;
+    changeSelectMode -object;   
+    
+    if($flat==0) nonLinear -type wave -minRadius 0 -maxRadius 1.5 -amplitude .5 -wavelength 3.5 -dropoff 0 -offset 0 -ap;
+    else nonLinear -type wave -minRadius 0 -maxRadius 1.5 -amplitude .02 -wavelength 1 -dropoff 0 -offset 0 -ap;
+    
+    string $allHistory[] = `listHistory $plane[0]`;
+    string $waveNode[] = `ls -type "nonLinear" $allHistory`;
+    string $noiseNode[] = `ls -type "polyMoveFace" $allHistory`;
+    string $polyPlane[] = `ls -type "polyPlane" $allHistory`;
+    
+    addAttr -ln "amplitude" -k 1 -at double -dv (getAttr($waveNode[0]+".amplitude")) $plane[0];
+    addAttr -ln "wavelength" -k 1 -at double -dv (getAttr($waveNode[0]+".wavelength")) $plane[0];
+    addAttr -ln "offset" -k 1 -at double -dv (getAttr($waveNode[0]+".offset")) $plane[0];
+    addAttr -ln "minRadius" -k 1 -at double -dv (getAttr($waveNode[0]+".minRadius")) $plane[0];
+    addAttr -ln "maxRadius" -k 1 -at double -dv (getAttr($waveNode[0]+".maxRadius")) $plane[0];
+    
+    addAttr -ln "width" -k 1 -at double -dv (getAttr($polyPlane[0]+".width")) $plane[0];
+    addAttr -ln "height" -k 1 -at double -dv (getAttr($polyPlane[0]+".height")) $plane[0];
+    addAttr -ln "subdivisionsWidth" -k 1 -at long -dv (4*int($div)) $plane[0];
+    addAttr -ln "subdivisionsHeight" -k 1 -at long -dv (4*int($div)) $plane[0];
+    
+    addAttr -ln "noise" -k 1 -at double -dv (getAttr($noiseNode[0]+".localTranslateZ")) $plane[0];
+    
+    connectAttr -f ($plane[0]+".amplitude")  ($waveNode[0]+".amplitude");
+    connectAttr -f ($plane[0]+".wavelength") ($waveNode[0]+".wavelength");
+    connectAttr -f ($plane[0]+".offset")     ($waveNode[0]+".offset");
+    connectAttr -f ($plane[0]+".minRadius")  ($waveNode[0]+".minRadius");
+    connectAttr -f ($plane[0]+".maxRadius")  ($waveNode[0]+".maxRadius");
+    
+    connectAttr -f ($plane[0]+".width") ($polyPlane[0]+".width");
+    connectAttr -f ($plane[0]+".height") ($polyPlane[0]+".height");
+    connectAttr -f ($plane[0]+".subdivisionsWidth") ($polyPlane[0]+".subdivisionsWidth");
+    connectAttr -f ($plane[0]+".subdivisionsHeight") ($polyPlane[0]+".subdivisionsHeight");
+
+    connectAttr -f ($plane[0]+".noise") ($noiseNode[0]+".localTranslateZ");
+    
+    setAttr ".rotateX" -90;
+    pickWalk -d up;
+    if($flat==0){
+        move 0 0 -0.05 .scalePivot .rotatePivot;
+        move 0 0 0.05;
+    }
+    scale -r -xyz $YZ $YZ $X;
+    select $geo[0];
+    return $geo[0];
+}
+
+//CREATES SPHERE(S)
+
+global proc string pl_chipOffsphere(float $minScale, float $maxScale, int $minDiv, int $maxDiv, int $singleMode, string $name){    
+    if(!`objExists Chips_pl_chipOff`){
+        shadingNode -asShader lambert -ss -n Chips_pl_chipOff;
+        setAttr "Chips_pl_chipOff.transparency" -type double3 0.8 0.8 0.8;
+    }  
+    
+    float $X, $YZ;
+   
+    if($singleMode>0){
+        float $bb[] = `pl_bboxComp`; 
+        if($bb[0]<1 && $bb[0]>-1) $bb[0] = -1;
+        if($bb[1]<1 && $bb[1]>-1) $bb[1] = 1;
+        if($bb[2]<1 && $bb[2]>-1) $bb[2] = 1;   
+        $YZ = $bb[0]+$bb[1]+$bb[2];             
+        $X = -.5*$YZ; 
+    }
+    else{        
+        $YZ = rand($minScale, $maxScale);          
+        $X = .5*$YZ;   
+    }
+    
+    float $div = rand($minDiv, $maxDiv);
+    string $cube[] = `polyCube -w 1 -h 1 -d 1 -sx 1 -sy 1 -sz 1 -ax 0 1 0 -ch 1 -n ($name+"_pl_sphere1")`;    
+    string $geo[] = `listRelatives -f`;
+    catchQuiet(`hyperShade -a Chips_pl_chipOff`); 
+    move 0 0 -0.15 .scalePivot .rotatePivot;
+    move 0 0 0.15;
+    makeIdentity -apply true -t 1 -r 0 -s 0 -n 0 -pn 1;            
+
+    polySmooth  -mth 0 -dv 3 -bnr 1 -c 1 -kb 0 -ksb 1 -khe 0 -kt 1 -kmb 1 -suv 0 -peh 0 -sl 1 -dpe 1 -ps 0.1 -ro 1 -ch 1;
+    scale -a -xyz 100 100 100 $cube[0]; 
+    polyMoveFacet -ch 1 -random 10 -ltz ((4.5/$div));
+    scale -a -xyz 1 1 1 $cube[0]; 
+    ConvertSelectionToUVs;
+    polyEditUV -u 0 -v 2;        
+                
+    string $allHistory[] = `listHistory $cube[0]`;
+
+    string $polyCube[] = `ls -type "polyCube" $allHistory`;  
+    string $noiseNode[] = `ls -type "polyMoveFace" $allHistory`;    
+    string $polySmooth[] = `ls -type "polySmoothFace" $allHistory`;       
+   
+    addAttr -ln "width" -k 1 -at double -dv (getAttr($polyCube[0]+".width")) $cube[0];
+    addAttr -ln "height" -k 1 -at double -dv (getAttr($polyCube[0]+".height")) $cube[0];
+    addAttr -ln "depth" -k 1 -at double -dv (getAttr($polyCube[0]+".depth")) $cube[0];
+    addAttr -ln "subdivisionsWidth" -k 1 -at long -dv (getAttr($polyCube[0]+".subdivisionsWidth")) $cube[0];
+    addAttr -ln "subdivisionsHeight" -k 1 -at long -dv (getAttr($polyCube[0]+".subdivisionsHeight")) $cube[0];
+    addAttr -ln "subdivisionsDepth" -k 1 -at long -dv (getAttr($polyCube[0]+".subdivisionsDepth")) $cube[0];
+       
+    addAttr -ln "divisions" -k 1 -at long -dv (int($div)) $cube[0];   
+    addAttr -ln "noise" -k 1 -at double -dv (getAttr($noiseNode[0]+".localTranslateZ")) $cube[0];
+    
+    connectAttr -f ($cube[0]+".width") ($polyCube[0]+".width");
+    connectAttr -f ($cube[0]+".height") ($polyCube[0]+".height");
+    connectAttr -f ($cube[0]+".depth") ($polyCube[0]+".depth");
+    connectAttr -f ($cube[0]+".subdivisionsWidth") ($polyCube[0]+".subdivisionsWidth");
+    connectAttr -f ($cube[0]+".subdivisionsHeight") ($polyCube[0]+".subdivisionsHeight");
+    connectAttr -f ($cube[0]+".subdivisionsDepth") ($polyCube[0]+".subdivisionsDepth");
+    
+    connectAttr -f ($cube[0]+".divisions") ($polySmooth[0]+".divisions");
+    connectAttr -f ($cube[0]+".noise") ($noiseNode[0]+".localTranslateZ"); 
+    
+    changeSelectMode -component;
+    changeSelectMode -object;   
+    scale -r -xyz $YZ $YZ $X;
+    select $geo[0];
+    return $geo[0];
+}
+
+//SORTS AND CUTS GEO(S) BY pl_shatterCutBy
+
+global proc pl_chipOffshatterBy(){
+    string $org[] = `ls -sl -l`;
+    string $orgShapeTemp[] = `listRelatives -c -f -type mesh`;
+    string $orgShape[] = `ls -l -ni $orgShapeTemp`;
+    int $result = `checkBoxGrp -query -v1 RESULT_ONLY`;
+    int $delorg = `checkBoxGrp -query -v1 DEL`;
+    pickWalk -d down;
+    string $orgGrp[] = `ls -sl -l -type transform`;   
+    pickWalk -d up;
+    
+    if(size($orgShape) > 2){            
+            string $geo[] = `listRelatives -p -f $orgShape`;
+            string $mainGeo[] = `ls -hd 1 -l $geo`;
+            for($i=1; $i<size($geo); $i++){
+                select -r `ls -tl 1 -l $mainGeo` $geo[$i];
+                $mainGeo = `pl_shatterCutBy`;
+            }
+    }
+    
+    if(size($orgGrp)>0 || size($orgShape) == 1){         
+        for($i=0; $i<size($orgShape); $i++){
+            string $mainGeo[] = `listRelatives -p -f $orgShape[$i]`;
+            string $geoGrp = (substituteAllString($mainGeo[0], `match (".*[|]") $mainGeo[0]`, "")+"_pl_chipOff");
+            string $geo[] = `listRelatives -c -f $geoGrp`;
+            
+            for($each in $geo){
+                select -r $mainGeo[0] $each;
+                $mainGeo = `pl_shatterCutBy`;
+            }
+        }
+    }
+    
+   if(size($orgShape) == 2)  pl_shatterCutBy;
+   
+   if($result>0){
+       string $clean[] = `listRelatives -f -p $orgShape`;
+       stringArrayRemoveAtIndex(0, $clean);
+       delete $clean;
+   }
+   
+   if($delorg>0) delete $org[0];
+   
+}
+
+//CREATES CUT GEO(S) FROM SELECTION AND RUNS pl_chipOffshatterBy
+
+global proc pl_chipOffDo(int $preview, int $singleMode, int $usePlane, int $flat, int $result, int $legacy, float $minScale, float $maxScale, int $minDiv, int $maxDiv){
+    string $selected[] = `ls -sl -fl -l`;
+    int $sizeSelected = size($selected);
+    string $allShapes[] = `ls -sl -fl -l -o`; 
+    string $allTrans[] = `listRelatives -p -type "transform" $allShapes`;
+    $allTrans[0] = substituteAllString($allTrans[0], (`match "_pl_chunk.*" $allTrans[0]`), "");
+    string $allTransFull[] = `listRelatives -f -p -type "transform" $allShapes`;
+    int $checker = ($sizeSelected == 1 && `nodeType $selected[0]` == "transform") ? 1 : 0;
+    int $sizeSel = ($singleMode>0) ? 1 : $sizeSelected;
+    string $chunk[] = {};
+
+    if($checker>0){
+        $allTrans = `ls -l -sl $selected`;
+        $allTrans[0] = substituteAllString($allTrans[0], (`match ".*[|]" $allTrans[0]`), "");
+        $allTrans[0] = substituteAllString($allTrans[0], (`match "_pl_chunk.*" $allTrans[0]`), "");
+        $allTransFull = $selected;
+    }
+   
+    string $groups[] = {};  
+    
+    if(`match ("[.]") $selected[0]` == "." || ($checker>0 && $usePlane>0)){        
+            if(!`objExists "pl_chipOff_GRP"` && !`objExists ($allTrans[0]+"_pl_chipOff")`)
+                createNode -ss transform -n "pl_chipOff_GRP";
+            if(!`objExists ($allTrans[0]+"_pl_chipOff")`){ 
+                createNode -ss transform -n ($allTrans[0]+"_pl_chipOff") -p pl_chipOff_GRP;
+            }
+     
+        for($i=0; $i<$sizeSel; $i++){
+            string $chipObj="";
+            changeSelectMode -object;  
+            if ($singleMode>0) select -r $selected;
+            else select -r $selected[$i];
+            float $trot[] = `pl_vector`;
+            if($usePlane>0) pl_chipOffplane $minScale  $maxScale $minDiv $maxDiv $singleMode $flat $allTrans[0];
+            else pl_chipOffsphere $minScale $maxScale $minDiv $maxDiv $singleMode $allTrans[0];       
+          
+            string $grp = "";
+                  
+            if($checker>0){                              
+                vector $pos = getAttr($selected[0]+".center");
+                vector $bb = getAttr($selected[0]+".boundingBoxSize");
+                float $scale = ($bb.x+$bb.y+$bb.z);
+                move ($pos.x) ($pos.y) ($pos.z);
+                scale $scale $scale $scale;                
+            }
+            else{
+                pickWalk -d up;
+                xform -r -m $trot[0] $trot[1] $trot[2] $trot[3] $trot[4] $trot[5] $trot[6] $trot[7] $trot[8] $trot[9] $trot[10] $trot[11] $trot[12] $trot[13] $trot[14] $trot[15] ;
+            }          
+
+            select -r `ls -sl -l` ($allTrans[0] + "_pl_chipOff");  
+            catchQuiet(`parent`);    
+            $chunk[$i] = stringArrayToString(`ls -sl -l`, "");  
+        }  
+        
+        select -r $allTransFull $chunk;        
+        
+        if($preview==0) pl_chipOffshatterBy();
+    }    
+    else pl_chipOffshatterBy();
+}
+
+global proc pl_shatterExplode(){
+    string $sl[]=`ls -l -sl -tr`;
+    int $slcount=`size($sl)`;
+    
+    if($slcount==0) confirmDialog -t "Select" -ma "center" -message "Please select at least one object of the group!" -b "OK" -db "OK";   
+    else{
+        if(`objExists pl_Locator`) confirmDialog -t "Select" -ma "center" -message "The explode item already exists!" -b "OK" -db "OK";
+        else{
+            pickWalk -d up;
+            string $group[]= `ls -l -sl -tr`;
+            xform -cp;
+            makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;
+            float $sX= (getAttr(".boundingBoxSizeX"));
+            float $sY= (getAttr(".boundingBoxSizeY"));
+            float $sZ= (getAttr(".boundingBoxSizeZ"));
+            float $pivot[] = `xform -q -os -rp`;
+            select -hi;
+            xform -cp;
+            string $objects[]= `ls -l -sl -tr`;
+            spaceLocator -p 0 0 0 -n pl_Locator;
+            setAttr ".visibility" 0;
+            string $locator[]= `ls -l -sl -tr`;
+            move $pivot[0] $pivot[1] $pivot[2];
+            
+            for($c=0; size($objects)>$c; $c++){
+                select $locator;
+                select -add $objects[$c];
+                doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","1" };
+            }
+            select $locator;
+            expression -s "pl_Locator.sy = pl_Locator.sx; pl_Locator.sz = pl_Locator.sx;"  -o locator1 -ae 1 -uc all ;
+            
+            if(`window -exists EXPLODE`) deleteUI EXPLODE;	
+            window -h 55 EXPLODE;
+            columnLayout -cat "left" 5;
+            attrFieldSliderGrp -l "Offset" -w 315 -fmn 1 -fmx 100 -min 1 -max 3 -at ("pl_Locator.sx") -cal 1 left -cw 1 35;
+            button -ann "delete explode item" -label "DELETE" -w 310 -h 30 -command "delete pl_Locator; deleteUI EXPLODE;";
+            showWindow EXPLODE;   
+            setAttr "pl_Locator.scaleX" 1.2;
+        }
+    }
+}
+
+
+//CHIPOFF UI
+
+global proc pl_chipOff(){
+    if(`window -exists PL_CHIPOFF`) deleteUI PL_CHIPOFF;        
+    window -s 0 -t "pl_chipOff v1.2" PL_CHIPOFF;
+    columnLayout  -rs 1;
+    
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+       
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "PREVIEW"
+        -ann "preview the cutting geo(s), to cut press CUT button one more time"
+        -value1 1
+        PREVIEW;     
+
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "SINGLE MODE"
+        -ann "build the cutting geo around selected points"  
+        -onc "floatSliderGrp -e -en 0 MIN_SCALE; floatSliderGrp -e -en 0 MAX_SCALE;"
+        -ofc "floatSliderGrp -e -en 1 MIN_SCALE; floatSliderGrp -e -en 1 MAX_SCALE;"
+        -value1 0
+        SINGLE_MODE;
+
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "USE PLANE"
+        -ann "deformed planes"  
+        -onc "checkBoxGrp -e -en 1 FLAT;"
+        -ofc "checkBoxGrp -e -en 0 FLAT;"
+        -value1 0
+        USE_PLANE;
+        
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "FLAT"
+        -ann "flat planes"  
+        -value1 0
+        -en 0
+        FLAT;        
+        
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "RESULT ONLY"
+        -ann "delete the cutting geo after the cut operation"  
+        -value1 0
+        RESULT_ONLY;   
+
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "DELETE ORG"
+        -ann "delete original mesh instead of hiding"  
+        -value1 0
+        DEL;   
+        
+    checkBoxGrp        
+        -cat 1 left 45
+        -numberOfCheckBoxes 1
+        -label "USE LEGACY"
+        -ann "use legacy Boolean algorithm"  
+        -value1 1
+        LEGACY;        
+        
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+    textFieldGrp -w 350 -cat 1 left 45 -l "GROUP NAME" -tx pl_shattered_GRP -ann "group name for the result" GRP_CUT;   
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+    
+    floatSliderGrp 
+        -cat 1 left 45
+        -l "MIN SCALE"
+        -field on
+        -w 350
+        -v 10
+        -fmn -10000
+        -fmx 10000
+        -min .1
+        -max 100   
+        -en 1     
+        -pre 3
+        MIN_SCALE;
+            
+    floatSliderGrp 
+        -cat 1 left 45
+        -l "MAX SCALE"
+        -field on
+        -w 350
+        -v 10
+        -fmn -10000
+        -fmx 10000
+        -min .1
+        -max 100   
+        -en 1
+        -pre 3
+        MAX_SCALE;
+            
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+
+    intSliderGrp 
+        -cat 1 left 45
+        -l "MIN DIV"
+        -field on
+        -w 350
+        -v 2
+        -fmn 1
+        -fmx 50
+        -min 1
+        -max 10   
+        -en 1     
+        MIN_DIV;
+
+    intSliderGrp 
+        -cat 1 left 45
+        -l "MAX DIV"
+        -field on
+        -w 350
+        -v 2
+        -fmn 1
+        -fmx 50
+        -min 1
+        -max 10   
+        -en 1     
+        MAX_DIV;
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+
+    floatSliderGrp 
+        -cat 1 left 45
+        -l "MERGE DISTANCE"
+        -field on
+        -w 350
+        -v .001
+        -fmn -10000
+        -fmx 10000
+        -min .1
+        -max 100   
+        -en 1     
+        -pre 4
+        MERGE;
+                            
+    separator -w 400 -h 10 -hr 1 -style "in"; 
+    
+    button -label "CUT" -w 400 -h 35 -c "pl_chipOffDo `checkBoxGrp -q -v1 PREVIEW` `checkBoxGrp -q -v1 SINGLE_MODE` `checkBoxGrp -q -v1 USE_PLANE` `checkBoxGrp -q -v1 FLAT` `checkBoxGrp -q -v1 RESULT_ONLY` `checkBoxGrp -q -v1 LEGACY` `floatSliderGrp -q -v MIN_SCALE` `floatSliderGrp -q -v MAX_SCALE` `intSliderGrp -q -v MIN_DIV` `intSliderGrp -q -v MAX_DIV`;" -ann "DO IT!!!";
+    button -label "EXPLODE" -w 400 -h 35 -c "pl_shatterExplode" -ann "DO IT!!!";
+    
+    separator -w 400 -h 10 -hr 1 -style "in";
+    //windowPref -remove PL_CHIPOFF;
+    showWindow PL_CHIPOFF;
+}
+
+pl_chipOff()

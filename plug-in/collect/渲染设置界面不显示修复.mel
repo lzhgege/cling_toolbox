@@ -1,0 +1,4 @@
+//delete "defaultArnoldRenderOptions";
+unifiedRenderGlobalsRevertToDefault;
+deleteUI unifiedRenderGlobalsWindow;  
+buildNewSceneUI;
