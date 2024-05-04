@@ -5,23 +5,21 @@ CG技术交流群：872491740
 
 更多详细使用说明：https://www.kdocs.cn/l/ccYmd7tdoOnR
 
-更新详情：https://www.cgfml.com/195275.html
+更新详情：https://gitee.com/one-finger-shenman_0/cling_toolbox
 
 有任何问题均可联系我，微信请备注来意，建议QQ群
 ——————————————————————————————————————
-离线版安装-----下载压缩包，将其解压到D:\Cling_toolbox，运行压缩包内的“离线版安装.bat”即可安装
+安装教程
+点击右侧立即下载按钮下载压缩包安装，将其解压到D:\Cling_toolbox，
 
-在线版傻瓜式安装双击运行“cling_toolbox一键安装.bat”然后打开或重启maya即可享用，（前提是电脑有网络）
+双击“一键安装.bat”装完成后重启maya生效
 
-
-若想要将个人收藏或者自己添加的一些插件复制到另外一台机也是同理操作，将旧设备的“D:\Cling_toolbox”复制到新设备的“D:\Cling_toolbox”运行压缩包内的“离线版安装.bat”即可安装
-
-或者使用“cling_toolbox一键安装.bat”安装完成后将旧设备的"D:\Cling_toolbox\json\collect_plugin.json"拷贝到新设备对应的目录
+安装完成后重启maya
 
 
-离线版更新：用有网络的设备下载“https://tool.cgfml.com/Cling_toolbox/Cling_toolbox.zip”并解压到“D:\Cling_toolbox”覆盖即可
+离线版更新：用有网络的设备下载“https://gitee.com/one-finger-shenman_0/cling_toolbox/repository/archive/master.zip”并解压到“D:\Cling_toolbox”覆盖即可
 
 有网络的电脑直接点击maya菜单栏中的cling_toolbox找到“更新工具架”点击即可
 
 ———————————————————————————————————————
-注意maya版本必须是2018.6——2020
+注意maya版本必须是2024+

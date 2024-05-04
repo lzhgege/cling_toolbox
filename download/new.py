@@ -20,7 +20,7 @@ def pull_updates(repo):
     origin.pull()
     # 更新成功后的确认对话框
     cmds.confirmDialog(title='Update Successful',
-                       message='更新已完成，请重启工具架享用！',
+                       message=u'更新已完成，请重启工具架享用！',
                        button=['OK'], defaultButton='OK', cancelButton='OK', dismissString='OK')
     # 关闭窗口
     cmds.deleteUI('UpdateWindow', window=True)
@@ -49,7 +49,7 @@ def check_for_updates(repo_path, remote_url):
     if not diffs:
         # 如果没有差异，说明已经是最新版本
         cmds.confirmDialog(title='No Updates',
-                           message='当前已经是最新版啦！',
+                           message=u'当前已经是最新版啦！',
                            button=['OK'], defaultButton='OK', cancelButton='OK', dismissString='OK')
     else:
         # 如果有差异，说明有更新
