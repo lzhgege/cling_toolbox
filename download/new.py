@@ -18,6 +18,8 @@ def pull_updates(repo):
     # 从远程仓库拉取更新
     origin = repo.remotes.origin
     origin.pull()
+    # 恢复 "GPU_project.json" 文件到更新前的状态
+    repo.git.checkout('HEAD', '--', 'json/GPU_project.json')
     # 更新成功后的确认对话框
     cmds.confirmDialog(title='Update Successful',
                        message=u'更新已完成，请重启工具架享用！',
