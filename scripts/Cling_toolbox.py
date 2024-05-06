@@ -8,32 +8,32 @@
 import os
 import json
 import maya.cmds as cmds
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 import sys
 from importlib import reload
 
 from maya import OpenMayaUI
-import shiboken2
+import shiboken6
 import maya.mel as mel
 import maya.mel
 import re
 from collections import OrderedDict, defaultdict
 from functools import partial
-from PySide2.QtWidgets import QTreeWidgetItem, QTreeWidget, QListWidgetItem, QMenu, QAction, QColorDialog
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import QTreeWidgetItem, QTreeWidget, QListWidgetItem, QMenu, QColorDialog, QWidget
+from PySide6.QtCore import Qt
 import arnold as ar
 import maya.OpenMayaUI as omui
 import codecs
 import subprocess
-from shiboken2 import wrapInstance
-from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QSplitter, QAbstractItemView, QDialog, QTextEdit, QLabel, QVBoxLayout, QLineEdit, QHBoxLayout, QPushButton, QFileDialog
-from PySide2.QtCore import QRegExp
-from PySide2.QtGui import QRegExpValidator
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtCore import QThread, Signal
-from PySide2.QtCore import QSettings
+from shiboken6 import wrapInstance
+from PySide6.QtGui import QIcon, QColor
+from PySide6.QtWidgets import QSplitter, QAbstractItemView, QDialog, QTextEdit, QLabel, QVBoxLayout, QLineEdit, QHBoxLayout, QPushButton, QFileDialog
+
+
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QSettings
 
 class LoadJsonThread(QThread):
     load_finished = Signal(dict, str)
@@ -438,7 +438,9 @@ class IconGridWindow(QtWidgets.QMainWindow):
         def addGroupItem(tree_widget, group_name):
             item = QTreeWidgetItem(tree_widget)
             item.setText(0, group_name)
-            item.setFlags(item.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable)
+            # 设置项目可以被用户选中并且有复选框
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            #item.setCheckState(0, Qt.Unchecked)  # 初始设置为未选中状态
             return item
 
         def execute_plugin(item):

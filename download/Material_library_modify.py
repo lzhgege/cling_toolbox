@@ -8,7 +8,7 @@
 import json
 import os
 import sys
-from PySide2.QtWidgets import QApplication, QFileDialog
+from PySide6.QtWidgets import QApplication, QFileDialog
 import maya.cmds as cmds
 
 # 在Maya中指定使用UTF-8编码

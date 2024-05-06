@@ -11,10 +11,10 @@ import os
 import shutil
 import json
 import re
-from PySide2 import QtWidgets, QtCore, QtGui
-from PySide2.QtWidgets import QPushButton, QColorDialog
+from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6.QtWidgets import QPushButton, QColorDialog
 import glob
-from shiboken2 import wrapInstance
+from shiboken6 import wrapInstance
 from maya import OpenMayaUI as omui
 import maya.mel
 import sys

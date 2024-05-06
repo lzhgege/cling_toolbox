@@ -3,9 +3,9 @@ import sys
 import os
 import maya.cmds as cmds
 import maya.OpenMayaUI as omui
-from shiboken2 import wrapInstance
-from PySide2.QtWidgets import QWidget
-from PySide2.QtCore import Qt
+from shiboken6 import wrapInstance
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Qt
 import maya.utils
 
 # 设置环境变量的函数

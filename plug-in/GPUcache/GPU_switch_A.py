@@ -8,10 +8,10 @@
 # 敲码不易修改搬运请保留以上信息，感谢！！！！！
 import os, datetime
 import maya.OpenMayaUI as omui
-import shiboken2
-from shiboken2 import wrapInstance
+import shiboken6
+from shiboken6 import wrapInstance
 import maya.cmds as cmds
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 import functools
 
 import maya.OpenMayaUI as mui
@@ -46,7 +46,7 @@ class MayaUIWindow(QtWidgets.QWidget):
 
         # 获取Maya主窗口
         main_window_ptr = mui.MQtUtil.mainWindow()
-        main_window = shiboken2.wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
+        main_window = shiboken6.wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
 
         # 设置窗口大小和位置
         self.setGeometry(main_window.frameGeometry().width() // 2, main_window.frameGeometry().height() // 2, 400, 300)
@@ -1038,7 +1038,7 @@ class MayaUIWindow(QtWidgets.QWidget):
 
         # 将这个QWidget转换为Maya窗口
         ptr = mui.MQtUtil.mainWindow()
-        main_window = shiboken2.wrapInstance(int(ptr), QtWidgets.QWidget)
+        main_window = shiboken6.wrapInstance(int(ptr), QtWidgets.QWidget)
         self.setParent(main_window, QtCore.Qt.Window)
 
         # 显示窗口

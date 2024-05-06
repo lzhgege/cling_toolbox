@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import os
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 from maya import OpenMayaUI as omui
-from shiboken2 import wrapInstance
+from shiboken6 import wrapInstance
 
 def maya_main_window():
     main_window_ptr = omui.MQtUtil.mainWindow()
