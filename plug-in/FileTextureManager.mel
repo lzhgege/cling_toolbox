@@ -1304,11 +1304,11 @@ global proc checkboxPrompt()
     formLayout -e -numberOfDivisions 100 -w $formWidth $form ;
 
     string $titleLayout = `columnLayout -adj 1 -rs 5`;
-    string $t = `text -al "left" -l "以下贴图名字重复：(取消将被覆盖)"`;
+    string $t = `text -al "left" -l "The following texture names are duplicated: (Cancel will be overwritten)"`;
     string $titleFormLayout = `formLayout -numberOfDivisions 100`;
     string $title1 = `text -l "file" -bgc $filebgcValue $filebgcValue $filebgcValue -h $titleHeight`;
-    string $title2 = `text -l "贴图名字修改为：" -bgc $picbgcValue $picbgcValue $picbgcValue -h $titleHeight`;
-    string $title3 = `text -l "贴图原始路径" -bgc $filebgcValue $filebgcValue $filebgcValue -h $titleHeight`;
+    string $title2 = `text -l "Change the name to：" -bgc $picbgcValue $picbgcValue $picbgcValue -h $titleHeight`;
+    string $title3 = `text -l "original path" -bgc $filebgcValue $filebgcValue $filebgcValue -h $titleHeight`;
     formLayout -edit
         -attachForm            $title1   "top"    0
         -attachForm            $title1   "left"   0
@@ -1346,10 +1346,10 @@ global proc checkboxPrompt()
         -attachForm            $c3Layout   "bottom" 0
         -attachPosition        $c3Layout  "left"  0 50
     $scrollFormLayout;
-    
+
     setParent $form;
-    string $acceptBtn = `button -l "确定" -c ("getArray(\"" + $c2Layout + "\")")`;
-    string $cancelBtn = `button -l "取消" -c "layoutDialog -dismiss \"dismiss\""`;
+    string $acceptBtn = `button -l "ok" -c ("getArray(\"" + $c2Layout + "\")")`;
+    string $cancelBtn = `button -l "Cancel" -c "layoutDialog -dismiss \"dismiss\""`;
     
     int $edge = 5;
 
