@@ -39,17 +39,15 @@ from PySide6.QtCore import QSettings
 class LoadJsonThread(QThread):
     load_finished = Signal(dict, str)
 
-
     def run(self):
         try:
-            response = requests.get('https://tool.cgfml.com/Cling_toolbox_3.0/help_document.json', timeout=5)
-            gx = requests.get('https://tool.cgfml.com/Cling_toolbox_3.0/gx_document.html', timeout=5)
-            response.encoding = 'utf-8'
-            gx.encoding = 'utf-8'
-            data = response.json()
-            self.load_finished.emit(data, gx.text)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            self.load_finished.emit({}, "当前为离线版，更新记录，详情请访问https://www.cgfml.com/195275.html查看")
+            with open('D:\\cling_toolbox\\html\\help_document.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            with open('D:\\cling_toolbox\\html\\gx_document.html', 'r', encoding='utf-8') as f:
+                gx = f.read()
+            self.load_finished.emit(data, gx)
+        except FileNotFoundError:
+            self.load_finished.emit({}, "当前为离线版，更新记录，详情请访问https://gitee.com/one-finger-shenman_0/cling_toolbox查看")
 
 
 
@@ -751,9 +749,9 @@ class IconGridWindow(QtWidgets.QMainWindow):
                             </style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">
                             <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">作者：cling</h3>
                             <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">微信：clingkaka</h3>
-                            <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">工具官网：<a href=\"https://www.cgfml.com/195275.html\"><span style=\" text-decoration: underline; color:#ff8000;\">https://www.cgfml.com/195275.html</span></a></h3>
+                            <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">工具官网：<a href=\"https://gitee.com/one-finger-shenman_0/cling_toolbox\"><span style=\" text-decoration: underline; color:#ff8000;\">https://gitee.com/one-finger-shenman_0/cling_toolbox</span></a></h3>
                             <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">模型下载：<a href=\"https://www.cgfml.com\"><span style=\" text-decoration: underline; color:#ff8000;\">www.cgfml.com</span></a></h3>
-                            <h3 style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">AI聊天绘画：<a href=\"https://ai.cgfml.com\"><span style=\" text-decoration: underline; color:#ff8000;\">ai.cgfml.com</span></a></h3>
+                           
                             </body></html>
                             """
 
